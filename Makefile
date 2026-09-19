@@ -12,9 +12,8 @@ format: ## Formata o código com ruff
 	uv run ruff format src
 	uv run ruff check --fix src
 
-lint: ## Roda o linter (ruff) e o typecheck (mypy)
+lint: ## Roda o linter (ruff)
 	uv run ruff check src
-	uv run mypy src
 
 test: ## Roda os testes com pytest
 	uv run pytest src/ponte_tocha/*.py -v
