@@ -97,8 +97,8 @@ class Estado(NamedTuple):
     def __repr__(self) -> str:
         """Representacao compacta para debugging."""
         compacto = (
-            self.origem,
-            self.destino,
+            set(self.origem),
+            set(self.destino),
             self.tocha_na_origem,
             self.estimativa_heuristica,
         )
@@ -120,6 +120,10 @@ class EstadoDestino:
     estado: Estado
     acao: Acoes
     custo: int = 0
+
+    def __repr__(self) -> str:
+        classname = self.__class__.__name__
+        return f"{classname}({self.estado}, {str(self.acao)}, {self.custo})"
 
 
 class EspacoEstado:
@@ -153,7 +157,9 @@ class EspacoEstado:
         """Retorna o estado objetivo."""
         return Estado.new(set(), self._pessoas, False, 0)
 
-    def add_aresta(self, estado: Estado, custo: int = 0): ...
+    def add_aresta(self, estado_origem: Estado, *destinos: EstadoDestino) -> None:
+        """Adiciona uma ou mais arestas partindo de `estado_origem` no mapa de adjacência."""
+        self._mapa_adjacencia.setdefault(estado_origem, set()).update(destinos)
 
     def fn_sucessora(self, estado: Estado) -> set[EstadoDestino, ...]:
         """
@@ -250,7 +256,6 @@ class TestEstado:
         candidatos = estado.get_candidatos()
         esperado = {(p1,), (p2,), (p3,), (p1, p2), (p1, p3), (p2, p3)}
         esperado = {frozenset(p) for p in esperado}
-        pprint(candidatos)
         assert candidatos == esperado
 
     def test_transicoes(self): ...
@@ -281,6 +286,8 @@ class TestEspacoEstado:
             EstadoDestino(s2, Acoes.IR, custo=1),
             EstadoDestino(s3, Acoes.IR, custo=1),
         }
+        print()
+        pprint(esperado)
         assert result == esperado
 
         # expandir estado s1
@@ -297,3 +304,20 @@ class TestEspacoEstado:
         # o estado é a funcao objetivo, nada mais a expandir
         result = ee.fn_sucessora(s3)
         assert result == set()
+
+    def test_add_aresta(self):
+        pessoas = {Pessoa(1), Pessoa(2)}
+        ee = EspacoEstado(pessoas)
+
+        d1 = EstadoDestino(Estado.new(set(), pessoas, False, 0), Acoes.IR, custo=2)
+        d2 = EstadoDestino(Estado.new(pessoas, set(), True, 0), Acoes.VOLTAR, custo=1)
+
+        # add_aresta aceita varios destinos de uma vez, mesmo para um estado novo
+        s1 = Estado.new({Pessoa(3)}, set(), False, 0)
+        ee.add_aresta(s1, d1, d2)
+        assert ee._mapa_adjacencia[s1] == {d1, d2}
+
+        # chamar de novo para o mesmo estado deve acumular, nao substituir
+        d3 = EstadoDestino(Estado.new(set(), pessoas, True, 0), Acoes.IR, custo=3)
+        ee.add_aresta(s1, d3)
+        assert ee._mapa_adjacencia[s1] == {d1, d2, d3}
