@@ -1,5 +1,6 @@
 from collections.abc import Sequence
 from dataclasses import dataclass, field
+from enum import StrEnum
 from pprint import pprint
 from typing import NamedTuple
 
@@ -36,19 +37,16 @@ class Estado(NamedTuple):
     Representa um estado no problema da ponte e tocha.
 
     Args:
-        origem:
-            O conjunto de origem. Representa as pessoas do lado inicial da
-            ponte. Uma pessoa é representada como o tempo em minutos que ela
-            demora para atravessar.
-        destino:
-            O conjunto de destino. Representa as pessoas que chegaram estão outro lado.
-        tocha_na_origem:
-            Verdadeira se a tocha está atualmente no lado inicial da ponte.
+        origem: Representa o conjunto de pessoas do lado inicial da ponte.
+        destino: Representa o conjunto de pessoas no lado final da ponte.
+        tocha_na_origem: Verdadeira se a tocha está atualmente no lado inicial da ponte.
+        estimativa_heuristica: O valor estimado para a heuristica
     """
 
     origem: frozenset[Pessoa]
     destino: frozenset[Pessoa]
     tocha_na_origem: bool
+    estimativa_heuristica: int = 0
 
     @classmethod
     def init(cls, custos_iniciais: Sequence[int]) -> "Estado":
@@ -88,22 +86,117 @@ class Estado(NamedTuple):
 
     def __repr__(self) -> str:
         """Representacao compacta para debugging."""
-        compacto = (self.origem, self.destino, self.tocha_na_origem)
+        compacto = (
+            self.origem,
+            self.destino,
+            self.tocha_na_origem,
+            self.estimativa_heuristica,
+        )
         return str(compacto)
 
 
-def f_sucessora(estado: Estado): ...
+class Acoes(StrEnum):
+    ir = "ir"
+    voltar = "voltar"
+
+
+@dataclass(frozen=True)
+class EstadoDestino:
+    """Representa o destino em um mapa de adjacência.
+
+    Encapsula propriedades da aresta como a acao e o peso.
+    """
+
+    estado: Estado
+    acao: Acoes
+    custo: int = 0
 
 
 class EspacoEstado:
-    def __init__(self): ...
+    def __init__(self, pessoas: Sequence[Pessoa], fn_heuristica=None):
+        self._estado_inicial = Estado(frozenset(pessoas), frozenset(), True, 0)
+        # Mapa de Adjacencia:
+        # 
+        # Mapeia um nó para os vizinhos (directionados) com um peso associado.
+        # Exemplos, dados os estados e0, e1 e e2:
+        #
+        # a) e0 tem uma aresta para e1 e para e2, sem custos
+        # e0: { EstadoDestino(e1, "ir"), EstadoDestino(e2, "voltar") }
+        #
+        # b) item, mas com custos associados
+        # e0: { EstadoDestino(e1, "ir", custo=1), EstadoDestino(e2, "voltar", custo=2) }
+        self._mapa_adjacencia: dict[Estado, frozenset(EstadoDestino, ...)] = {
+            self._estado_inicial: self.fn_sucessora(self._estado_inicial)
+        }
+        self._fn_heuristica = fn_heuristica or h_padrao
+        self._pessoas = pessoas
 
-    def gerar(self): ...
+    @property
+    def estado_inicial(self) -> Estado:
+        """Retorna o estado inicial."""
+        return self._estado_inicial
 
-    def as_dict(self): ...
+    @property
+    def estado_objetivo(self) -> Estado:
+        """Retorna o estado objetivo."""
+        return Estado(frozenset(), frozenset(self._pessoas), False, 0)
+
+    def add_aresta(self, estado: Estado, custo: int = 0): ...
+
+    def fn_sucessora(self, estado: Estado) -> set[EstadoDestino, ...]:
+        """
+        Retorna todos os os estados de destino possiveis a partir desse.
+
+        Se o próximo estado for um cliclo, retorna None.
+        """
+        combinacoes_movimento = estado.get_candidatos()
+        resultado = set()
+        for pessoas_a_mover in combinacoes_movimento:
+            estado_destino = self.fn_transicao(estado, pessoas_a_mover)
+            if not estado_destino:  # ciclo
+                continue
+            resultado.add(estado_destino)
+        return resultado
+
+    def fn_transicao(
+        self, estado: Estado, pessoas_a_mover: set[Pessoa] | set[Pessoa, Pessoa]
+    ) -> EstadoDestino:
+        """Retorna o restulado de mover pessoas partindo do estado atual."""
+        acao = "ir" if estado.tocha_na_origem else "voltar"
+        # validacao
+        if acao == "ir":
+            for p in pessoas_a_mover:
+                if p not in estado.origem:
+                    raise RuntimeError("Tentando atravessar uma pessoa que nao esta na origem")
+        if acao == "voltar":
+            # TODO: podemos considerar nunca queremos voltar com duas pessoas?
+            for p in pessoas_a_mover:
+                if p not in estado.destino:
+                    raise RuntimeError("Tentando voltar com uma pessoa que nao esta no destino")
+        else:
+            raise ValueError(f"Acao invalida: {acao}")
+
+        # criar proximo estado
+        prox_origem = estado.origem.difference(pessoas_a_mover)
+        prox_destino = estado.destino.union(pessoas_a_mover)
+        prox_tocha_na_origem = not estado.tocha_na_origem
+        valor_heuristica = self._fn_heuristica(estado, self.estado_objetivo)
+        proximo_estado = Estado(prox_origem, prox_destino, prox_tocha_na_origem, valor_heuristica)
+        # evitar ciclos: nao pode voltar para estado ja existente
+        if proximo_estado in self._mapa_adjacencia.keys():
+            return None
+        # criar estado destino com propriedades da transicao acopladas
+        custo = max(pessoas_a_mover, key=lambda p: p.custo)
+        destino = EstadoDestino(proximo_estado, acao, custo)
+        return destino
+
+    def plot(self): ...
 
 
-ESTADO_INICIAL = Estado(frozenset(), frozenset(), True)
+def h_padrao(estado: Estado, estado_objetivo: Estado):
+    """Funcao heuristica padrao."""
+    return 0
+
 
 # Testes
 
@@ -143,7 +236,11 @@ class TestEstado:
     def test_transicoes(self): ...
 
 
-def test_espaco_estado_inicia():
-    ee = EspacoEstado()
-    ee.gerar()
-    ee.as_dict()
+class TestEspacoEstado:
+    def test_inicia(self):
+        p1 = Pessoa(1)
+        p2 = Pessoa(1)
+        pessoas = set([p1, p2])
+        ee = EspacoEstado(pessoas)
+        assert len(ee) == 1
+        assert ee.estado_inicial == Estado(frozenset(p1, p2), frozenset(), True, 0)
