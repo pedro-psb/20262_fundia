@@ -17,4 +17,4 @@ lint: ## Roda o linter (ruff) e o typecheck (mypy)
 	uv run mypy src
 
 test: ## Roda os testes com pytest
-	uv run pytest src/ponte_tocha/*.py
+	uv run pytest src/ponte_tocha/*.py -v

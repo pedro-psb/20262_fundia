@@ -1,7 +1,16 @@
 from collections.abc import Sequence
 from dataclasses import dataclass, field
+from pprint import pprint
 from typing import NamedTuple
-from uuid import UUID, uuid4
+
+counter = 0
+
+
+def get_id() -> int:
+    global counter
+    id = counter
+    counter += 1
+    return id
 
 
 @dataclass(frozen=True)
@@ -15,7 +24,11 @@ class Pessoa:
     """
 
     custo: int
-    id: UUID = field(default_factory=uuid4)
+    id: int = field(default_factory=get_id)
+
+    def __repr__(self) -> str:
+        """Representacao compacta para debugging."""
+        return f"p_{self.id}(c={self.custo})"
 
 
 class Estado(NamedTuple):
@@ -68,14 +81,15 @@ class Estado(NamedTuple):
         """
         combinacoes = set()
         for p_i in self.origem:
-            combinacoes.add(frozenset(p_i))
+            combinacoes.add(frozenset((p_i,)))
             for p_j in self.origem:
-                combinacoes.add(frozenset(p_i, p_j))
+                combinacoes.add(frozenset((p_i, p_j)))
         return combinacoes
 
-    def repr_compacta(self):
+    def __repr__(self) -> str:
+        """Representacao compacta para debugging."""
         compacto = (self.origem, self.destino, self.tocha_na_origem)
-        print(compacto)
+        return str(compacto)
 
 
 def f_sucessora(estado: Estado): ...
@@ -114,10 +128,22 @@ class TestEstado:
         custos = sorted([p.custo for p in e2.origem])
         assert custos == [1, 2, 2]
 
+    def test_candidatos(self):
+        p1 = Pessoa(1)
+        p2 = Pessoa(1)
+        p3 = Pessoa(1)
+        origem = frozenset([p1, p2, p3])
+        estado = Estado(origem, frozenset(), True)
+        candidatos = estado.get_candidatos()
+        esperado = {(p1,), (p2,), (p3,), (p1, p2), (p1, p3), (p2, p3)}
+        esperado = {frozenset(p) for p in esperado}
+        pprint(candidatos)
+        assert candidatos == esperado
+
+    def test_transicoes(self): ...
+
 
 def test_espaco_estado_inicia():
-    estado_0 = Estado({1}, {}, 0)
-    print(estado_0.repr_compacta())
     ee = EspacoEstado()
     ee.gerar()
     ee.as_dict()
