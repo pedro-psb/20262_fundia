@@ -27,6 +27,8 @@ Os testes ficam dentro do próprio arquivo de implementação (ex.: `src/ponte_t
 
 ```sh
 uv run pytest src/ponte_tocha/main.py
+uv run pytest src/ponte_tocha/main.py -s          # mostra resultado de prints!
+uv run pytest src/ponte_tocha/main.py -k palavra  # filtra por testes que tenha 'palavar'
 ```
 
 ### Lint
