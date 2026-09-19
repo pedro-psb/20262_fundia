@@ -17,6 +17,7 @@ class ResultadoBusca:
 class Busca(ABC):
     def __init__(self, espaco_estado: EspacoEstado):
         self._espaco_estado = espaco_estado
+        self._visitados: set[Estado] = set()  # para evitar ciclos
 
     @abstractmethod
     def buscar(self) -> ResultadoBusca | None:

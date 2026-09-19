@@ -105,20 +105,17 @@ class Estado(NamedTuple):
         return str(compacto)
 
 
-class Acoes(StrEnum):
+class Movimento(StrEnum):
     IR = "ir"
     VOLTAR = "voltar"
 
 
 @dataclass(frozen=True)
-class EstadoDestino:
-    """Representa o destino em um mapa de adjacência.
-
-    Encapsula propriedades da aresta como a acao e o peso.
-    """
+class Sucessor:
+    """Representa um proximo estado de destino e com sua acao e peso."""
 
     estado: Estado
-    acao: Acoes
+    acao: Movimento
     custo: int = 0
 
     def __repr__(self) -> str:
@@ -131,21 +128,6 @@ class EspacoEstado:
         self._estado_inicial = Estado.new(pessoas, set(), True, 0)
         self._fn_heuristica = fn_heuristica or h_padrao
         self._pessoas = pessoas
-        # Mapa de Adjacencia:
-        #
-        # Mapeia um nó para os vizinhos (directionados) com um peso associado.
-        # Exemplos, dados os estados e0, e1 e e2:
-        #
-        # a) e0 tem uma aresta para e1 e para e2, sem custos
-        # e0: { EstadoDestino(e1, "ir"), EstadoDestino(e2, "voltar") }
-        #
-        # b) item, mas com custos associados
-        # e0: { EstadoDestino(e1, "ir", custo=1), EstadoDestino(e2, "voltar", custo=2) }
-        self._mapa_adjacencia: dict[Estado, frozenset(EstadoDestino, ...)] = {}
-        self._mapa_adjacencia[self._estado_inicial] = self.fn_sucessora(self._estado_inicial)
-
-    def __len__(self) -> int:
-        return len(self._mapa_adjacencia)
 
     @property
     def estado_inicial(self) -> Estado:
@@ -157,38 +139,28 @@ class EspacoEstado:
         """Retorna o estado objetivo."""
         return Estado.new(set(), self._pessoas, False, 0)
 
-    def add_aresta(self, estado_origem: Estado, *destinos: EstadoDestino) -> None:
-        """Adiciona uma ou mais arestas partindo de `estado_origem` no mapa de adjacência."""
-        self._mapa_adjacencia.setdefault(estado_origem, set()).update(destinos)
+    def fn_sucessora(self, estado: Estado) -> set[Sucessor]:
+        """Retorna todos os estados de destino possiveis a partir desse.
 
-    def fn_sucessora(self, estado: Estado) -> set[EstadoDestino, ...]:
-        """
-        Retorna todos os os estados de destino possiveis a partir desse.
-
-        Se o próximo estado for um cliclo, retorna None.
+        Não evita ciclos: cabe ao algoritmo de busca controlar quais estados
+        já foram visitados.
         """
         if estado.is_estado_final():
             return set()
         combinacoes_movimento = estado.get_candidatos()
-        resultado = set()
-        for pessoas_a_mover in combinacoes_movimento:
-            estado_destino = self.acao_mover(estado, pessoas_a_mover)
-            if not estado_destino:  # ciclo detectado
-                continue
-            resultado.add(estado_destino)
-        return resultado
+        return {
+            self.acao_mover(estado, pessoas_a_mover) for pessoas_a_mover in combinacoes_movimento
+        }
 
-    def acao_mover(
-        self, estado: Estado, pessoas_a_mover: set[Pessoa] | set[Pessoa, Pessoa]
-    ) -> EstadoDestino:
+    def acao_mover(self, estado: Estado, pessoas_a_mover: Iterable[Pessoa]) -> Sucessor:
         """Retorna o restulado de mover pessoas partindo do estado atual."""
-        acao = Acoes.IR if estado.tocha_na_origem else Acoes.VOLTAR
+        acao = Movimento.IR if estado.tocha_na_origem else Movimento.VOLTAR
         # validacao
-        if acao == Acoes.IR:
+        if acao == Movimento.IR:
             for p in pessoas_a_mover:
                 if p not in estado.origem:
                     raise RuntimeError("Tentando atravessar uma pessoa que nao esta na origem")
-        elif acao == Acoes.VOLTAR:
+        elif acao == Movimento.VOLTAR:
             # TODO: podemos considerar que nunca queremos voltar com duas pessoas?
             for p in pessoas_a_mover:
                 if p not in estado.destino:
@@ -197,7 +169,7 @@ class EspacoEstado:
             raise ValueError(f"Acao invalida: {acao}")
 
         # criar proximo estado
-        if acao == Acoes.IR:
+        if acao == Movimento.IR:
             prox_origem = estado.origem.difference(pessoas_a_mover)
             prox_destino = estado.destino.union(pessoas_a_mover)
         else:
@@ -208,15 +180,9 @@ class EspacoEstado:
         proximo_estado = Estado.new(
             prox_origem, prox_destino, prox_tocha_na_origem, valor_heuristica
         )
-        # evitar ciclos: nao pode voltar para estado ja existente
-        if proximo_estado in self._mapa_adjacencia.keys():
-            return None
         # criar estado destino com propriedades da transicao acopladas
         custo = max(p.custo for p in pessoas_a_mover)
-        destino = EstadoDestino(proximo_estado, acao, custo)
-        return destino
-
-    def plot(self): ...
+        return Sucessor(proximo_estado, acao, custo)
 
 
 def h_padrao(estado: Estado, estado_objetivo: Estado):
@@ -265,7 +231,6 @@ class TestEspacoEstado:
     def test_inicia(self):
         pessoas = {Pessoa(1), Pessoa(1)}
         ee = EspacoEstado(pessoas)
-        assert len(ee) == 1
         assert ee.estado_inicial == Estado.new(pessoas, set(), True, 0)
 
     def test_funcao_sucessora(self):
@@ -282,9 +247,9 @@ class TestEspacoEstado:
         s2 = Estado.new({p1}, {p2}, False, 0)
         s3 = Estado.new(set(), {p1, p2}, False, 0)
         esperado = {
-            EstadoDestino(s1, Acoes.IR, custo=1),
-            EstadoDestino(s2, Acoes.IR, custo=1),
-            EstadoDestino(s3, Acoes.IR, custo=1),
+            Sucessor(s1, Movimento.IR, custo=1),
+            Sucessor(s2, Movimento.IR, custo=1),
+            Sucessor(s3, Movimento.IR, custo=1),
         }
         print()
         pprint(esperado)
@@ -292,32 +257,16 @@ class TestEspacoEstado:
 
         # expandir estado s1
         # - a tocha esta no lado B, entao o unico movimento é p1 voltar
-        # - p1 voltar seria um ciclo, entao nao há movimentos
+        # - isso leva de volta ao estado inicial s0; fn_sucessora não evita esse
+        #   ciclo, isso fica a cargo do algoritmo de busca (via seu visitados)
         result = ee.fn_sucessora(s1)
-        assert result == set()
+        assert result == {Sucessor(s0, Movimento.VOLTAR, custo=1)}
 
-        # expandir estado s2 (item para s1)
+        # expandir estado s2 (simetrico a s1)
         result = ee.fn_sucessora(s2)
-        assert result == set()
+        assert result == {Sucessor(s0, Movimento.VOLTAR, custo=1)}
 
         # expandir estado s3
         # o estado é a funcao objetivo, nada mais a expandir
         result = ee.fn_sucessora(s3)
         assert result == set()
-
-    def test_add_aresta(self):
-        pessoas = {Pessoa(1), Pessoa(2)}
-        ee = EspacoEstado(pessoas)
-
-        d1 = EstadoDestino(Estado.new(set(), pessoas, False, 0), Acoes.IR, custo=2)
-        d2 = EstadoDestino(Estado.new(pessoas, set(), True, 0), Acoes.VOLTAR, custo=1)
-
-        # add_aresta aceita varios destinos de uma vez, mesmo para um estado novo
-        s1 = Estado.new({Pessoa(3)}, set(), False, 0)
-        ee.add_aresta(s1, d1, d2)
-        assert ee._mapa_adjacencia[s1] == {d1, d2}
-
-        # chamar de novo para o mesmo estado deve acumular, nao substituir
-        d3 = EstadoDestino(Estado.new(set(), pessoas, True, 0), Acoes.IR, custo=3)
-        ee.add_aresta(s1, d3)
-        assert ee._mapa_adjacencia[s1] == {d1, d2, d3}
