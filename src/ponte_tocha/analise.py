@@ -33,17 +33,52 @@ class EstatisticaBusca:
     n_repeticoes: int = 1
 
 
+@dataclass(frozen=True)
+class ConfigGrafico:
+    campo: str
+    nome_arquivo: str
+    titulo: str
+    ylabel: str
+    formato_valor: str
+    linha_referencia: float | None = None
+    rotulo_referencia: str | None = None
+    multiplicador: float = 1.0
+
+
 class AnaliseBusca:
     COLUNAS = [campo.name for campo in fields(EstatisticaBusca)]
-    ESTATISTICAS_DO_GRAFICO = ["custo_caminho", "nos_visitados", "tempo_s"]
-    ROTULOS_DO_GRAFICO = ["Custo do caminho", "Nós visitados", "Tempo (s)"]
     NOME_CSV = "resultados.csv"
-    NOME_GRAFICO = "grafico.png"
+
+    CONFIGURACOES_GRAFICOS: tuple[ConfigGrafico, ...] = (
+        ConfigGrafico(
+            campo="custo_caminho",
+            nome_arquivo="grafico_custo.png",
+            titulo="Custo do Caminho (Tempo Total de Travessia)",
+            ylabel="Tempo de travessia (minutos)",
+            formato_valor="%.1f",
+            linha_referencia=17.0,
+            rotulo_referencia="Mínimo teórico (17 min)",
+        ),
+        ConfigGrafico(
+            campo="nos_visitados",
+            nome_arquivo="grafico_nos_visitados.png",
+            titulo="Nós Visitados durante a Busca",
+            ylabel="Quantidade de nós visitados",
+            formato_valor="%.1f",
+        ),
+        ConfigGrafico(
+            campo="tempo_s",
+            nome_arquivo="grafico_tempo.png",
+            titulo="Tempo de Processamento",
+            ylabel="Tempo de processamento (ms)",
+            formato_valor="%.3f",
+            multiplicador=1000.0,
+        ),
+    )
 
     def __init__(self, diretorio: Path):
         self.diretorio = diretorio
         self.caminho_csv = diretorio / self.NOME_CSV
-        self.caminho_grafico = diretorio / self.NOME_GRAFICO
 
     def salvar_csv(self, estatisticas: list[EstatisticaBusca]) -> None:
         with self.caminho_csv.open("w", newline="") as arquivo:
@@ -51,43 +86,68 @@ class AnaliseBusca:
             writer.writeheader()
             writer.writerows(asdict(estatistica) for estatistica in estatisticas)
 
-    def salvar_grafico(self, estatisticas: list[EstatisticaBusca]) -> None:
-        valores_por_estatistica = {
-            nome: [getattr(estatistica, nome) or 0 for estatistica in estatisticas]
-            for nome in self.ESTATISTICAS_DO_GRAFICO
-        }
-        normalizados_por_estatistica = {
-            nome: [valor / max(valores) if max(valores) else 0 for valor in valores]
-            for nome, valores in valores_por_estatistica.items()
-        }
+    def salvar_graficos(self, estatisticas: list[EstatisticaBusca]) -> list[Path]:
+        caminhos_gerados = []
+        algoritmos = [e.algoritmo for e in estatisticas]
+        cores = ["#4C72B0", "#DD8452", "#55A868", "#C44E52"]
 
-        n_algoritmos = len(estatisticas)
-        largura_barra = 0.5 / n_algoritmos
-        posicoes_grupo = range(len(self.ESTATISTICAS_DO_GRAFICO))
+        for config in self.CONFIGURACOES_GRAFICOS:
+            valores = [(getattr(e, config.campo) or 0) * config.multiplicador for e in estatisticas]
+            caminho_arquivo = self.diretorio / config.nome_arquivo
 
-        fig, ax = plt.subplots(figsize=(8, 5))
-        for i, estatistica in enumerate(estatisticas):
-            valores = [
-                normalizados_por_estatistica[nome][i] for nome in self.ESTATISTICAS_DO_GRAFICO
+            fig, ax = plt.subplots(figsize=(7, 4.5))
+            barras = ax.bar(
+                algoritmos,
+                valores,
+                color=cores[: len(algoritmos)],
+                width=0.55,
+            )
+            ax.set_ylabel(config.ylabel)
+            ax.set_title(config.titulo, fontsize=12, fontweight="bold")
+            ax.tick_params(axis="x", rotation=15)
+
+            if config.linha_referencia is not None:
+                ax.axhline(
+                    y=config.linha_referencia * config.multiplicador,
+                    color="gray",
+                    linestyle="--",
+                    linewidth=1.5,
+                    alpha=0.85,
+                    label=config.rotulo_referencia or f"{config.linha_referencia}",
+                )
+                ax.legend(loc="upper right")
+
+            labels = [
+                config.formato_valor % val if getattr(e, config.campo) is not None else "N/A"
+                for val, e in zip(valores, estatisticas, strict=False)
             ]
-            posicoes = [p + i * largura_barra for p in posicoes_grupo]
-            ax.bar(posicoes, valores, width=largura_barra, label=estatistica.algoritmo)
+            ax.bar_label(barras, labels=labels, padding=3, fontsize=9)
 
-        centro_offset = largura_barra * (n_algoritmos - 1) / 2
-        ax.set_xticks([p + centro_offset for p in posicoes_grupo])
-        ax.set_xticklabels(self.ROTULOS_DO_GRAFICO)
-        ax.set_ylabel("Valor normalizado (fração do máximo)")
-        ax.set_title("Comparação dos algoritmos de busca")
-        ax.legend(title="Algoritmo", loc="center left", bbox_to_anchor=(1, 0.5))
+            ref_val = (
+                [config.linha_referencia * config.multiplicador]
+                if config.linha_referencia is not None
+                else []
+            )
+            max_y = max(valores + ref_val)
+            if max_y > 0:
+                ax.set_ylim(0, max_y * 1.15)
 
-        fig.savefig(self.caminho_grafico, bbox_inches="tight")
-        plt.close(fig)
+            fig.tight_layout()
+            fig.savefig(caminho_arquivo, bbox_inches="tight")
+            plt.close(fig)
+            caminhos_gerados.append(caminho_arquivo)
+
+        return caminhos_gerados
+
+    def salvar_grafico(self, estatisticas: list[EstatisticaBusca]) -> None:
+        """Mantido para compatibilidade com chamadas legadas."""
+        self.salvar_graficos(estatisticas)
 
     def executar_analise(self, estatisticas: list[EstatisticaBusca]) -> Path:
         self.diretorio.mkdir(parents=True, exist_ok=True)
 
         self.salvar_csv(estatisticas)
-        self.salvar_grafico(estatisticas)
+        self.salvar_graficos(estatisticas)
 
         return self.diretorio
 
@@ -213,7 +273,9 @@ class TestExecutarAnalise:
 
         caminho_csv = diretorio / "resultados.csv"
         assert caminho_csv.exists()
-        assert (diretorio / "grafico.png").exists()
+        assert (diretorio / "grafico_custo.png").exists()
+        assert (diretorio / "grafico_nos_visitados.png").exists()
+        assert (diretorio / "grafico_tempo.png").exists()
 
         with caminho_csv.open() as arquivo:
             linhas = list(csv.DictReader(arquivo))
