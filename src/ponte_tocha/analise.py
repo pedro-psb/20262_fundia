@@ -27,9 +27,10 @@ class EstatisticaBusca:
 
     algoritmo: str
     encontrou_solucao: bool
-    custo_caminho: int | None
-    nos_visitados: int | None
+    custo_caminho: float | None
+    nos_visitados: float | None
     tempo_s: float
+    n_repeticoes: int = 1
 
 
 class AnaliseBusca:
@@ -100,37 +101,70 @@ ALGORITMOS: tuple[type[Busca], ...] = (
 )
 
 
-def coletar_estatisticas(custos_iniciais: list[int]) -> list[EstatisticaBusca]:
+def coletar_estatisticas(
+    custos_iniciais: list[int],
+    n_repeticoes: int = 100,
+) -> list[EstatisticaBusca]:
     estatisticas = []
     for cls in ALGORITMOS:
-        espaco_estado = EspacoEstado(Pessoa.factory(custos_iniciais))
-        busca = cls(espaco_estado)
-        inicio = time.perf_counter()
-        resultado = busca.buscar()
-        tempo_s = time.perf_counter() - inicio
+        tempos: list[float] = []
+        custos: list[int] = []
+        nos_visitados_lista: list[int] = []
+        solucoes_encontradas = 0
+
+        for _ in range(n_repeticoes):
+            espaco_estado = EspacoEstado(list(Pessoa.factory(custos_iniciais)))
+            busca = cls(espaco_estado)
+            inicio = time.perf_counter()
+            resultado = busca.buscar()
+            tempo_s = time.perf_counter() - inicio
+            tempos.append(tempo_s)
+
+            if resultado is not None:
+                solucoes_encontradas += 1
+                custos.append(resultado.custo_caminho)
+                nos_visitados_lista.append(resultado.nos_visitados)
+
+        encontrou_solucao = solucoes_encontradas > 0
+        custo_medio = sum(custos) / len(custos) if custos else None
+        nos_visitados_medio = (
+            sum(nos_visitados_lista) / len(nos_visitados_lista) if nos_visitados_lista else None
+        )
+        tempo_medio = sum(tempos) / len(tempos) if tempos else 0.0
+
         estatisticas.append(
             EstatisticaBusca(
                 algoritmo=cls.__name__,
-                encontrou_solucao=resultado is not None,
-                custo_caminho=resultado.custo_caminho if resultado else None,
-                nos_visitados=resultado.nos_visitados if resultado else None,
-                tempo_s=tempo_s,
+                encontrou_solucao=encontrou_solucao,
+                custo_caminho=round(custo_medio, 2) if custo_medio is not None else None,
+                nos_visitados=round(nos_visitados_medio, 2)
+                if nos_visitados_medio is not None
+                else None,
+                tempo_s=tempo_medio,
+                n_repeticoes=n_repeticoes,
             )
         )
     return estatisticas
 
 
-def main(diretorio: Path) -> Path:
-    estatisticas = coletar_estatisticas(PROBLEMA)
+def main(diretorio: Path, n_repeticoes: int = 100) -> Path:
+    estatisticas = coletar_estatisticas(PROBLEMA, n_repeticoes=n_repeticoes)
     return AnaliseBusca(diretorio).executar_analise(estatisticas)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("diretorio", type=Path, help="Onde salvar o CSV e o gráfico")
+    parser.add_argument(
+        "--repeticoes",
+        "-n",
+        type=int,
+        default=100,
+        help="Número de repetições por algoritmo (padrão: 100)",
+    )
     args = parser.parse_args()
 
-    destino = main(args.diretorio)
+    destino = main(args.diretorio, n_repeticoes=args.repeticoes)
     print(f"Resultados salvos em: {destino}")
 
 
@@ -186,3 +220,13 @@ class TestExecutarAnalise:
         assert len(linhas) == len(ESTATISTICAS_ESTIMADAS)
         assert linhas[0]["algoritmo"] == "BuscaEmLargura"
         assert linhas[0]["custo_caminho"] == "17"
+
+    def test_coletar_estatisticas_com_repeticoes(self):
+        estatisticas = coletar_estatisticas([1, 2], n_repeticoes=5)
+        assert len(estatisticas) == len(ALGORITMOS)
+        for stat in estatisticas:
+            assert stat.encontrou_solucao is True
+            assert stat.n_repeticoes == 5
+            assert stat.custo_caminho is not None
+            assert stat.nos_visitados is not None
+            assert stat.tempo_s > 0

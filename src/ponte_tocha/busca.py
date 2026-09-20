@@ -2,6 +2,7 @@ import heapq
 import itertools
 import time
 from abc import ABC, abstractmethod
+from collections import deque
 from dataclasses import dataclass
 
 import pytest
@@ -33,11 +34,108 @@ class Busca(ABC):
 
 
 class BuscaEmLargura(Busca):
-    def buscar(self) -> ResultadoBusca | None: ...
+    def buscar(self, limite_nos: int | None = None) -> ResultadoBusca | None:
+        inicio_tempo = time.perf_counter()
+        estado_inicial = self._espaco_estado.estado_inicial
+
+        chave_inicial = (
+            estado_inicial.origem,
+            estado_inicial.destino,
+            estado_inicial.tocha_na_origem,
+        )
+
+        fila: deque[tuple[Estado, list[Estado], int]] = deque(
+            [(estado_inicial, [estado_inicial], 0)]
+        )
+        visitados = {chave_inicial}
+        nos_visitados = 0
+
+        while fila:
+            if limite_nos is not None and nos_visitados >= limite_nos:
+                return None
+
+            estado_atual, caminho, custo_atual = fila.popleft()
+            nos_visitados += 1
+
+            if estado_atual.is_estado_final():
+                fim_tempo = time.perf_counter()
+                return ResultadoBusca(
+                    caminho=caminho,
+                    custo_caminho=custo_atual,
+                    nos_visitados=nos_visitados,
+                    tempo_processamento=fim_tempo - inicio_tempo,
+                )
+
+            for sucessor in self._espaco_estado.fn_sucessora(estado_atual):
+                chave_sucessor = (
+                    sucessor.estado.origem,
+                    sucessor.estado.destino,
+                    sucessor.estado.tocha_na_origem,
+                )
+                if chave_sucessor not in visitados:
+                    visitados.add(chave_sucessor)
+                    fila.append(
+                        (
+                            sucessor.estado,
+                            caminho + [sucessor.estado],
+                            custo_atual + sucessor.custo,
+                        )
+                    )
+
+        return None
 
 
 class BuscaEmProfundidade(Busca):
-    def buscar(self) -> ResultadoBusca | None: ...
+    def buscar(self, limite_nos: int | None = None) -> ResultadoBusca | None:
+        inicio_tempo = time.perf_counter()
+        estado_inicial = self._espaco_estado.estado_inicial
+
+        pilha: list[tuple[Estado, list[Estado], int]] = [(estado_inicial, [estado_inicial], 0)]
+        visitados: set[tuple[frozenset[Pessoa], frozenset[Pessoa], bool]] = set()
+        nos_visitados = 0
+
+        while pilha:
+            if limite_nos is not None and nos_visitados >= limite_nos:
+                return None
+
+            estado_atual, caminho, custo_atual = pilha.pop()
+
+            chave_atual = (
+                estado_atual.origem,
+                estado_atual.destino,
+                estado_atual.tocha_na_origem,
+            )
+            if chave_atual in visitados:
+                continue
+
+            visitados.add(chave_atual)
+            nos_visitados += 1
+
+            if estado_atual.is_estado_final():
+                fim_tempo = time.perf_counter()
+                return ResultadoBusca(
+                    caminho=caminho,
+                    custo_caminho=custo_atual,
+                    nos_visitados=nos_visitados,
+                    tempo_processamento=fim_tempo - inicio_tempo,
+                )
+
+            for sucessor in self._espaco_estado.fn_sucessora(estado_atual):
+                chave_sucessor = (
+                    sucessor.estado.origem,
+                    sucessor.estado.destino,
+                    sucessor.estado.tocha_na_origem,
+                )
+                if chave_sucessor not in visitados:
+                    pilha.append(
+                        (
+                            sucessor.estado,
+                            caminho + [sucessor.estado],
+                            custo_atual + sucessor.custo,
+                        )
+                    )
+
+        return None
 
 
 class BuscaDeCustoUniforme(Busca):
@@ -48,13 +146,9 @@ class BuscaDeCustoUniforme(Busca):
 
         contador = itertools.count()
 
-        fronteira = [
-            (0, next(contador), estado_inicial, [estado_inicial])
-        ]
+        fronteira = [(0, next(contador), estado_inicial, [estado_inicial])]
 
-        melhor_custo = {
-            estado_inicial: 0
-        }
+        melhor_custo = {estado_inicial: 0}
 
         nos_visitados = 0
 
@@ -183,19 +277,30 @@ CASOS_CUSTO_OTIMO = [
 
 
 class TestBuscas:
-    def test_busca_em_largura(self):
-        espaco_estado = EspacoEstado(Pessoa.factory(CUSTOS_INICIAIS))
+    @pytest.mark.parametrize("custos", [[1], [1, 2], [1, 2, 5], [1, 2, 5, 10]])
+    def test_busca_em_largura(self, custos):
+        espaco_estado = EspacoEstado(Pessoa.factory(custos))
         busca = BuscaEmLargura(espaco_estado)
-        # TODO: calcular resposta esperada na mao
-        esperado = None
-        assert busca.buscar() == esperado
+        resultado = busca.buscar()
 
-    def test_busca_em_profundidade(self):
-        espaco_estado = EspacoEstado(Pessoa.factory(CUSTOS_INICIAIS))
+        assert resultado is not None
+        assert resultado.nos_visitados > 0
+        self._verificar_caminho(espaco_estado, resultado)
+
+    @pytest.mark.parametrize("custos", [[1], [1, 2], [1, 2, 5], [1, 2, 5, 10]])
+    def test_busca_em_profundidade(self, custos):
+        espaco_estado = EspacoEstado(Pessoa.factory(custos))
         busca = BuscaEmProfundidade(espaco_estado)
-        # TODO: calcular resposta esperada na mao
-        esperado = None
-        assert busca.buscar() == esperado
+        resultado = busca.buscar()
+
+        assert resultado is not None
+        assert resultado.nos_visitados > 0
+        self._verificar_caminho(espaco_estado, resultado)
+
+    def test_busca_com_limite_nos(self):
+        espaco_estado = EspacoEstado(Pessoa.factory([1, 2, 5, 10]))
+        assert BuscaEmLargura(espaco_estado).buscar(limite_nos=1) is None
+        assert BuscaEmProfundidade(espaco_estado).buscar(limite_nos=1) is None
 
     @pytest.mark.parametrize("custos, custo_esperado", CASOS_CUSTO_OTIMO)
     def test_busca_de_custo_uniforme(self, custos, custo_esperado):
