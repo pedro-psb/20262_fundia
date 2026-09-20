@@ -33,10 +33,11 @@ uv run pytest src/ponte_tocha/base.py -k palavra  # filtra por testes que tenha 
 
 ### Rodando a análise
 
-Roda cada algoritmo de busca contra um problema fixo e salva um CSV e um gráfico comparando-os (custo do caminho, nós visitados e tempo) no diretório informado:
+Roda cada algoritmo de busca contra um problema fixo em repetidas iterações (por padrão, 100 repetições) calculando as médias e salvando um CSV e um gráfico comparando-os (custo do caminho, nós visitados e tempo) no diretório informado:
 
 ```sh
-uv run python -m ponte_tocha.analise /tmp/ponte_tocha_analise
+uv run python -m ponte_tocha.analise results
+uv run python -m ponte_tocha.analise results --repeticoes 500  # altera o número de repetições
 ```
 
 ### Lint
