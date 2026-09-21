@@ -1,0 +1,34 @@
+\documentclass{IEEEtran}
+\usepackage[backend=biber, style=authoryear]{biblatex}
+\usepackage{amsmath}
+\usepackage{lipsum}
+\usepackage{duckuments}
+\addbibresource{references.bib}
+
+\title{TP1 - Fundamentos de IA}
+\author{
+	\IEEEauthorblockA{Pedro Pessoa Santos Brochado} \\
+	\IEEEauthorblockA{
+		\textit{Universidade Federal de Minas Gerais} \\
+	}
+}
+
+% Conteudo
+\begin{document}
+
+\maketitle
+
+\input{abstract.tex}
+
+% \blindduck[maths=display]
+
+\blindduck[maths=display]
+\input{intro.tex}
+\input{modelagem.tex}
+\input{implementacao.tex}
+\input{analise.tex}
+\input{conclusao.tex}
+
+\printbibliography
+
+\end{document}
