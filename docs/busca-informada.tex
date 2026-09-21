@@ -33,10 +33,9 @@ configuração do problema.
 
 \subsection{Busca de Custo Mínimo}
 
-A Busca de Custo Mínimo seleciona para expansão o estado que possui o menor
-custo acumulado $g(n)$. Para isso, foi utilizada uma fila de prioridade
-implementada por meio da estrutura \texttt{heapq} da biblioteca padrão do
-Python.
+A Busca de Custo Mínimo seleciona o caminho da fronteira com menor custo
+acumulado $g(n)$, implementando a fronteira como uma fila de prioridade por
+meio da estrutura \texttt{heapq} da biblioteca padrão do Python.
 
 Na implementação, cada elemento da fronteira armazena o custo acumulado, um
 valor auxiliar de desempate, o estado correspondente e o caminho percorrido
@@ -155,9 +154,10 @@ representa o custo real já gasto para alcançar o estado, enquanto
 
 representa uma estimativa do custo restante até o objetivo.
 
-A fila de prioridade do A* utiliza $f(n)$ para determinar qual estado será
-analisado primeiro. Assim, diferentemente da Busca de Custo Mínimo, que utiliza
-somente o custo acumulado, o A* também considera uma estimativa de quão próximo
+A fronteira do A*, também implementada como fila de prioridade, utiliza
+$f(n)$ para determinar qual estado será analisado primeiro. Assim,
+diferentemente da Busca de Custo Mínimo, que utiliza somente o custo
+acumulado, o A* também considera uma estimativa de quão próximo
 o estado está do objetivo.
 
 Na implementação, cada entrada da fila armazena o valor de prioridade, um

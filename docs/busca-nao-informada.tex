@@ -3,16 +3,22 @@
 
 Nesta etapa foram implementados dois métodos de busca não informada:
 a Busca em Profundidade (\textit{Depth-First Search} ou DFS) e a Busca
-em Largura (\textit{Breadth-First Search} ou BFS). Esses algoritmos exploram o
-espaço de estados utilizando apenas a estrutura de adjacência do
-grafo, sem levar em consideração o custo das arestas ou estimativas
+em Largura (\textit{Breadth-First Search} ou BFS).
+Esses algoritmos exploram o espaço de estados sem levar em consideração o custo das arestas ou estimativas
 heurísticas sobre a proximidade do nó ao objetivo.
+
+A \textbf{fronteira} é o conjunto de caminhos a partir do estado inicial que
+já foram gerados, mas ainda não explorados \parencite{poole2010}. A cada
+iteração, a estratégia de busca remove um caminho da fronteira e o estende
+com cada ação disponível a partir de seu último estado, devolvendo os
+caminhos resultantes à fronteira -- é essa escolha que diferencia os quatro
+algoritmos implementados neste trabalho.
 
 \subsection{Busca em Profundidade}
 \label{subsec:dfs}
 
 A Busca em Profundidade busca explorar o nó mais profundo (o mais longe do nó inicial)
-presente na fronteira de busca. Caso atinja um estado sem sucessores válidos não visitados, o
+presente na fronteira. Caso atinja um estado sem sucessores válidos não visitados, o
 algoritmo realiza o retorna para explorar ramos ainda não explorados.
 
 Para implementar a política LIFO (\textit{Last-In, First-Out}) característica deste
@@ -20,12 +26,9 @@ algoritmo, a fronteira foi estruturada por meio de uma pilha (\texttt{list} em P
 Cada entrada na pilha armazena uma tupla contendo o estado atual, a sequência de estados
 que compõem o caminho percorrido desde a raiz e o custo acumulado da trajetória.
 
-Como o espaço de estados do problema da Ponte e da Tocha contém múltiplos ciclos
-(devido à possibilidade de pessoas realizarem travessias repetidas de ida e volta),
-a DFS pura em árvore entraria em laços infinitos. Para garantir a terminação, foi
-adotada a busca em grafo com um conjunto de estados visitados (\texttt{visitados}).
-Um estado é formalmente adicionado a esse conjunto quando é retirado do topo da pilha
-para expansão. Caso um estado retirado já pertença a \texttt{visitados}, ele é descartado.
+Como o espaço de estados do problema da Ponte e da Tocha contém múltiplos ciclos,
+foi implementado um conjunto de nós visitados (\texttt{visitados})
+para evitar caminhadas cíclicas.
 
 A cada iteração, verifica-se a condição de parada através do método
 \texttt{is\_estado\_final()}. Ao encontrar a configuração em que todas as pessoas e a
@@ -39,7 +42,7 @@ Embora a DFS possua complexidade de espaço vantajosa em árvores gerais, em pro
 ponderados ela não oferece qualquer garantia de otimalidade. Como ela explora o
 primeiro ramo disponível até o nó folha, a solução encontrada frequentemente inclui
 movimentações redundantes e travessias demoradas, resultando em um tempo total de
-travessia muito superior ao mínimo possível.
+travessia superior ao mínimo possível.
 
 \subsection{Busca em Largura}
 \label{subsec:bfs}
