@@ -39,7 +39,7 @@ Todos os ensaios foram realizados em ambiente Linux x86\_64 com interpretador Py
 Os valores médios obtidos após as 100 execuções de cada algoritmo estão sumarizados na
 Tabela~\ref{tab:comparacao-final}.
 
-\begin{table}[H]
+\begin{table*}[t]
 	\centering
 	\caption{Comparação das métricas médias obtidas ao longo de 100 repetições na instância $[1, 2, 5, 10]$.}
 	\label{tab:comparacao-final}
@@ -53,25 +53,25 @@ Tabela~\ref{tab:comparacao-final}.
 		Busca A*                    & Sim            & 17{,}00           & 26{,}00       & 0{,}408          \\
 		\bottomrule
 	\end{tabular}
-\end{table}
+\end{table*}
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.75\textwidth]{results/grafico_custo.png}
+	\includegraphics[width=\columnwidth]{results/grafico_custo.png}
 	\caption{Comparação do tempo total de travessia (custo da solução) encontrado por cada algoritmo. A linha tracejada cinza indica o mínimo teórico ótimo de 17 minutos.}
 	\label{fig:grafico-custo}
 \end{figure}
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.75\textwidth]{results/grafico_nos_visitados.png}
+	\includegraphics[width=\columnwidth]{results/grafico_nos_visitados.png}
 	\caption{Quantidade média de nós visitados (expandidos da fronteira) até alcançar a solução.}
 	\label{fig:grafico-nos}
 \end{figure}
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.75\textwidth]{results/grafico_tempo.png}
+	\includegraphics[width=\columnwidth]{results/grafico_tempo.png}
 	\caption{Tempo médio de processamento por algoritmo expresso em milissegundos (ms).}
 	\label{fig:grafico-tempo}
 \end{figure}
