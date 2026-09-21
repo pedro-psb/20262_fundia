@@ -13,10 +13,10 @@ estado é uma solução.
 Cada estado $s_i \in S$ é representado como uma tripla $s_i = (A, B, \alpha)$,
 sendo:
 \begin{itemize}
-    \item $A$ o conjunto de pessoas do lado de origem da ponte;
-    \item $B$ o conjunto de pessoas do lado de destino da ponte;
-    \item $\alpha$ uma variável booleana que indica se a tocha está do lado
-    $A$ (verdadeira) ou do lado $B$ (falsa).
+	\item $A$ o conjunto de pessoas do lado de origem da ponte;
+	\item $B$ o conjunto de pessoas do lado de destino da ponte;
+	\item $\alpha$ uma variável booleana que indica se a tocha está do lado
+	      $A$ (verdadeira) ou do lado $B$ (falsa).
 \end{itemize}
 
 Na implementação, essa tripla é acrescida de um quarto valor correspondente à
@@ -57,11 +57,11 @@ resultante de transferir as pessoas de $p_i$ entre os lados $A$ e $B$ e de
 inverter a posição da tocha:
 
 \begin{equation}
-\begin{cases}
-F(s_i, p_i, q_i=\mathit{ir}) = (A \setminus p_i,\; B \cup p_i,\; \text{false})
-\\
-F(s_i, p_i, q_i=\mathit{voltar}) = (A \cup p_i,\; B \setminus p_i,\; \text{true})
-\end{cases}
+	\begin{cases}
+		F(s_i, p_i, q_i=\mathit{ir}) = (A \setminus p_i,\; B \cup p_i,\; \text{false})
+		\\
+		F(s_i, p_i, q_i=\mathit{voltar}) = (A \cup p_i,\; B \setminus p_i,\; \text{true})
+	\end{cases}
 \end{equation}
 
 Dado um estado, todos os seus sucessores são obtidos aplicando $F$ a cada
@@ -81,7 +81,7 @@ conjunto de pessoas que se movem em uma ação, o custo dessa transição é dad
 por:
 
 \[
-c(M) = \max_{p \in M} t(p)
+	c(M) = \max_{p \in M} t(p)
 \]
 
 \subsection{Representação do problema como grafo}

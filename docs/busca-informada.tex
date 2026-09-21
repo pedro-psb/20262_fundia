@@ -15,7 +15,7 @@ movimento. Dessa forma, para um conjunto $M$ de pessoas que atravessam, o
 custo da transição é definido por
 
 \[
-c(M)=\max_{p\in M} t(p),
+	c(M)=\max_{p\in M} t(p),
 \]
 
 em que $t(p)$ representa o tempo necessário para a pessoa $p$ atravessar a
@@ -25,7 +25,7 @@ A função $g(n)$ representa o custo total acumulado desde o estado inicial até
 o estado $n$. Para um sucessor $n'$ de $n$, tem-se
 
 \[
-g(n') = g(n) + c(n,n').
+	g(n') = g(n) + c(n,n').
 \]
 
 Assim, $g(n)$ corresponde ao tempo efetivamente gasto para alcançar determinada
@@ -48,7 +48,7 @@ armazena o menor custo conhecido para alcançar cada estado. Quando um sucessor
 é gerado, calcula-se
 
 \[
-g(n') = g(n) + c(n,n').
+	g(n') = g(n) + c(n,n').
 \]
 
 Caso esse novo valor seja menor que o custo anteriormente registrado para o
@@ -70,19 +70,19 @@ travessia entre as pessoas que ainda permanecem no lado de origem da ponte.
 A função utilizada é
 
 \[
-h(n)=
-\begin{cases}
-0, & \text{se a origem estiver vazia},\\[2mm]
-\displaystyle\max_{p\in \mathrm{origem}(n)} t(p),
-& \text{caso contrário}.
-\end{cases}
+	h(n)=
+	\begin{cases}
+		0, & \text{se a origem estiver vazia}, \\[2mm]
+		\displaystyle\max_{p\in \mathrm{origem}(n)} t(p),
+		   & \text{caso contrário}.
+	\end{cases}
 \]
 
 A ideia é considerar o tempo da pessoa mais lenta que ainda precisa sair do
 lado inicial. Como todos os tempos de travessia são positivos, tem-se também
 
 \[
-h(n)\geq 0.
+	h(n)\geq 0.
 \]
 
 Essa propriedade é compatível com a interpretação de $h(n)$ como uma
@@ -98,7 +98,7 @@ poderá ser menor que o tempo de travessia dessa pessoa.
 Assim,
 
 \[
-h(n) \leq h^*(n),
+	h(n) \leq h^*(n),
 \]
 
 em que $h^*(n)$ representa o custo real mínimo restante entre o estado $n$ e
@@ -107,7 +107,7 @@ o objetivo.
 A função também é consistente, isto é, para uma transição entre $n$ e $n'$,
 
 \[
-h(n) \leq c(n,n') + h(n').
+	h(n) \leq c(n,n') + h(n').
 \]
 
 Em um movimento de ida, o custo da travessia é suficiente para cobrir uma
@@ -138,19 +138,19 @@ A Busca A* utiliza simultaneamente o custo acumulado e uma estimativa do custo
 restante. Para cada estado é calculado
 
 \[
-f(n)=g(n)+h(n),
+	f(n)=g(n)+h(n),
 \]
 
 em que
 
 \[
-g(n)
+	g(n)
 \]
 
 representa o custo real já gasto para alcançar o estado, enquanto
 
 \[
-h(n)
+	h(n)
 \]
 
 representa uma estimativa do custo restante até o objetivo.
@@ -173,7 +173,7 @@ Como o objeto que representa um estado também contém o valor da heurística,
 foi utilizada como identificação lógica da configuração a tupla
 
 \[
-(\text{origem},\text{destino},\text{posição da tocha}).
+	(\text{origem},\text{destino},\text{posição da tocha}).
 \]
 
 Essa escolha evita que duas configurações equivalentes sejam interpretadas
@@ -191,32 +191,32 @@ Os resultados utilizados durante a validação são apresentados na
 Tabela~\ref{tab:testes-tarefa3}.
 
 \begin{table}[H]
-    \centering
-    \caption{Custos encontrados nos testes da Tarefa 3.}
-    \label{tab:testes-tarefa3}
-    \begin{tabular}{ccc}
-        \toprule
-        Tempos de travessia & Busca de Custo Mínimo & Busca A* \\
-        \midrule
-        $[1]$ & 1 & 1 \\
-        $[1,2]$ & 2 & 2 \\
-        $[1,2,5]$ & 8 & 8 \\
-        $[1,2,5,10]$ & 17 & 17 \\
-        $[2,2,2]$ & 6 & 6 \\
-        \bottomrule
-    \end{tabular}
+	\centering
+	\caption{Custos encontrados nos testes da Tarefa 3.}
+	\label{tab:testes-tarefa3}
+	\begin{tabular}{ccc}
+		\toprule
+		Tempos de travessia & Busca de Custo Mínimo & Busca A* \\
+		\midrule
+		$[1]$               & 1                     & 1        \\
+		$[1,2]$             & 2                     & 2        \\
+		$[1,2,5]$           & 8                     & 8        \\
+		$[1,2,5,10]$        & 17                    & 17       \\
+		$[2,2,2]$           & 6                     & 6        \\
+		\bottomrule
+	\end{tabular}
 \end{table}
 
 Para a instância clássica do problema,
 
 \[
-[1,2,5,10],
+	[1,2,5,10],
 \]
 
 os dois algoritmos encontraram uma solução de custo total igual a
 
 \[
-17 \text{ minutos}.
+	17 \text{ minutos}.
 \]
 
 Além da comparação dos custos finais, foram verificados os caminhos retornados
@@ -228,13 +228,13 @@ busca.
 Também foi testada a Busca A* utilizando uma heurística nula,
 
 \[
-h(n)=0.
+	h(n)=0.
 \]
 
 Nesse caso,
 
 \[
-f(n)=g(n),
+	f(n)=g(n),
 \]
 
 fazendo com que o critério de prioridade do A* se torne equivalente ao da
@@ -253,13 +253,13 @@ ordenar a fronteira.
 Na Busca de Custo Mínimo,
 
 \[
-\text{prioridade}(n)=g(n),
+	\text{prioridade}(n)=g(n),
 \]
 
 enquanto na Busca A*,
 
 \[
-\text{prioridade}(n)=g(n)+h(n).
+	\text{prioridade}(n)=g(n)+h(n).
 \]
 
 Assim, a Busca de Custo Mínimo considera somente o custo já realizado, enquanto

@@ -46,3 +46,10 @@ docs-build: docs-clean ## Build final da documentacao/relatorio
 .PHONY: docs-clean
 docs-clean: ## Build final da documentacao/relatorio
 	rm -rf $(BUILD_DIR) $(OUT_DIR)
+
+.PHONY: docs-format
+docs-format: ## Formata os arquivos .tex com latexindent
+	mkdir -p $(BUILD_DIR)
+	for f in $(TEX_FILES); do \
+		latexindent -w -s -c=$(BUILD_DIR) "$$f"; \
+	done
