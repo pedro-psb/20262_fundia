@@ -1,0 +1,275 @@
+\section{Busca de Custo Mínimo e Busca A*}
+\label{sec:busca-informada}
+
+Nesta etapa foram implementados dois algoritmos que utilizam o custo das
+transições para orientar a exploração do espaço de estados: a Busca de Custo
+Mínimo e a Busca A*. Como o objetivo do problema da Ponte e Tocha é minimizar
+o tempo total necessário para que todas as pessoas atravessem a ponte, o custo
+acumulado até cada estado passa a ser uma informação essencial para a busca.
+
+\subsection{Função de custo acumulado}
+
+Em cada travessia, uma ou duas pessoas podem atravessar a ponte. O custo da
+ação corresponde ao tempo da pessoa mais lenta entre aquelas envolvidas no
+movimento. Dessa forma, para um conjunto $M$ de pessoas que atravessam, o
+custo da transição é definido por
+
+\[
+c(M)=\max_{p\in M} t(p),
+\]
+
+em que $t(p)$ representa o tempo necessário para a pessoa $p$ atravessar a
+ponte.
+
+A função $g(n)$ representa o custo total acumulado desde o estado inicial até
+o estado $n$. Para um sucessor $n'$ de $n$, tem-se
+
+\[
+g(n') = g(n) + c(n,n').
+\]
+
+Assim, $g(n)$ corresponde ao tempo efetivamente gasto para alcançar determinada
+configuração do problema.
+
+\subsection{Busca de Custo Mínimo}
+
+A Busca de Custo Mínimo seleciona para expansão o estado que possui o menor
+custo acumulado $g(n)$. Para isso, foi utilizada uma fila de prioridade
+implementada por meio da estrutura \texttt{heapq} da biblioteca padrão do
+Python.
+
+Na implementação, cada elemento da fronteira armazena o custo acumulado, um
+valor auxiliar de desempate, o estado correspondente e o caminho percorrido
+até ele. Dessa forma, o elemento retirado da fila é sempre aquele associado ao
+menor valor de $g(n)$.
+
+Também foi utilizado um dicionário denominado \texttt{melhor\_custo}, que
+armazena o menor custo conhecido para alcançar cada estado. Quando um sucessor
+é gerado, calcula-se
+
+\[
+g(n') = g(n) + c(n,n').
+\]
+
+Caso esse novo valor seja menor que o custo anteriormente registrado para o
+mesmo estado, o dicionário é atualizado e o novo caminho é inserido na fila de
+prioridade.
+
+Entradas antigas da fila, correspondentes a caminhos que já foram superados
+por alternativas de menor custo, são descartadas durante a execução.
+
+Como os custos das travessias são não negativos, quando o estado objetivo é
+retirado da fila de prioridade, o custo associado a ele corresponde ao menor
+custo possível para alcançar a solução.
+
+\subsection{Função heurística}
+
+Para a Busca A* foi definida uma função heurística baseada no maior tempo de
+travessia entre as pessoas que ainda permanecem no lado de origem da ponte.
+
+A função utilizada é
+
+\[
+h(n)=
+\begin{cases}
+0, & \text{se a origem estiver vazia},\\[2mm]
+\displaystyle\max_{p\in \mathrm{origem}(n)} t(p),
+& \text{caso contrário}.
+\end{cases}
+\]
+
+A ideia é considerar o tempo da pessoa mais lenta que ainda precisa sair do
+lado inicial. Como todos os tempos de travessia são positivos, tem-se também
+
+\[
+h(n)\geq 0.
+\]
+
+Essa propriedade é compatível com a interpretação de $h(n)$ como uma
+estimativa do custo restante. Entretanto, a condição essencial para garantir
+que a heurística não comprometa a optimalidade do A* é a sua admissibilidade,
+isto é, que ela nunca superestime o custo real mínimo até o objetivo.
+
+A heurística é admissível porque a pessoa mais lenta que ainda se encontra na
+origem obrigatoriamente precisará atravessar a ponte pelo menos uma vez antes
+que o estado objetivo seja alcançado. Portanto, o custo real restante nunca
+poderá ser menor que o tempo de travessia dessa pessoa.
+
+Assim,
+
+\[
+h(n) \leq h^*(n),
+\]
+
+em que $h^*(n)$ representa o custo real mínimo restante entre o estado $n$ e
+o objetivo.
+
+A função também é consistente, isto é, para uma transição entre $n$ e $n'$,
+
+\[
+h(n) \leq c(n,n') + h(n').
+\]
+
+Em um movimento de ida, o custo da travessia é suficiente para cobrir uma
+eventual redução da estimativa. Em um movimento de volta, pessoas são
+adicionadas novamente ao lado de origem e, portanto, o maior tempo presente
+nesse lado não diminui.
+
+\subsection{Integração da heurística ao espaço de estados}
+
+Para que a Busca A* utilize corretamente a função heurística, cada estado deve
+armazenar uma estimativa correspondente à sua própria configuração.
+
+No estado inicial, a heurística é calculada logo após a criação do estado. Nos
+demais casos, primeiro é construído o estado sucessor, considerando as pessoas
+movimentadas e a nova posição da tocha. Somente depois é calculado o valor da
+heurística correspondente a esse novo estado.
+
+Dessa forma, evita-se utilizar a estimativa de um estado anterior como se ela
+pertencesse ao seu sucessor.
+
+A função heurística padrão do projeto foi mantida com valor zero. Assim, o
+espaço de estados pode continuar sendo utilizado por algoritmos que não
+necessitam de informação heurística.
+
+\subsection{Busca A*}
+
+A Busca A* utiliza simultaneamente o custo acumulado e uma estimativa do custo
+restante. Para cada estado é calculado
+
+\[
+f(n)=g(n)+h(n),
+\]
+
+em que
+
+\[
+g(n)
+\]
+
+representa o custo real já gasto para alcançar o estado, enquanto
+
+\[
+h(n)
+\]
+
+representa uma estimativa do custo restante até o objetivo.
+
+A fila de prioridade do A* utiliza $f(n)$ para determinar qual estado será
+analisado primeiro. Assim, diferentemente da Busca de Custo Mínimo, que utiliza
+somente o custo acumulado, o A* também considera uma estimativa de quão próximo
+o estado está do objetivo.
+
+Na implementação, cada entrada da fila armazena o valor de prioridade, um
+valor auxiliar de desempate, o custo acumulado $g(n)$, o estado e o caminho
+percorrido.
+
+O dicionário \texttt{melhor\_custo} continua armazenando apenas os valores de
+$g(n)$, pois esses valores representam os custos reais conhecidos. Caso um
+caminho de menor custo seja posteriormente encontrado para uma configuração já
+conhecida, o estado pode ser inserido novamente na fila.
+
+Como o objeto que representa um estado também contém o valor da heurística,
+foi utilizada como identificação lógica da configuração a tupla
+
+\[
+(\text{origem},\text{destino},\text{posição da tocha}).
+\]
+
+Essa escolha evita que duas configurações equivalentes sejam interpretadas
+como estados distintos apenas por apresentarem valores diferentes no campo da
+heurística.
+
+\subsection{Testes e validação da implementação}
+
+Foram utilizados diferentes conjuntos de tempos de travessia para verificar o
+funcionamento dos algoritmos. Os custos obtidos pela Busca de Custo Mínimo e
+pela Busca A* foram comparados, verificando-se que ambos encontraram os mesmos
+custos ótimos.
+
+Os resultados utilizados durante a validação são apresentados na
+Tabela~\ref{tab:testes-tarefa3}.
+
+\begin{table}[H]
+    \centering
+    \caption{Custos encontrados nos testes da Tarefa 3.}
+    \label{tab:testes-tarefa3}
+    \begin{tabular}{ccc}
+        \toprule
+        Tempos de travessia & Busca de Custo Mínimo & Busca A* \\
+        \midrule
+        $[1]$ & 1 & 1 \\
+        $[1,2]$ & 2 & 2 \\
+        $[1,2,5]$ & 8 & 8 \\
+        $[1,2,5,10]$ & 17 & 17 \\
+        $[2,2,2]$ & 6 & 6 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+Para a instância clássica do problema,
+
+\[
+[1,2,5,10],
+\]
+
+os dois algoritmos encontraram uma solução de custo total igual a
+
+\[
+17 \text{ minutos}.
+\]
+
+Além da comparação dos custos finais, foram verificados os caminhos retornados
+pelos algoritmos. Os testes confirmam que a posição da tocha é alternada após
+cada movimento, que são movimentadas uma ou duas pessoas por travessia e que a
+soma dos custos das transições coincide com o custo total informado pela
+busca.
+
+Também foi testada a Busca A* utilizando uma heurística nula,
+
+\[
+h(n)=0.
+\]
+
+Nesse caso,
+
+\[
+f(n)=g(n),
+\]
+
+fazendo com que o critério de prioridade do A* se torne equivalente ao da
+Busca de Custo Mínimo. Os custos obtidos permaneceram iguais, servindo como
+uma verificação adicional da implementação.
+
+Os testes também verificaram o valor da heurística no estado inicial, no estado
+objetivo e nos estados sucessores, além da propriedade de consistência nas
+transições consideradas.
+
+\subsection{Considerações sobre os métodos}
+
+A principal diferença entre os dois algoritmos está no critério utilizado para
+ordenar a fronteira.
+
+Na Busca de Custo Mínimo,
+
+\[
+\text{prioridade}(n)=g(n),
+\]
+
+enquanto na Busca A*,
+
+\[
+\text{prioridade}(n)=g(n)+h(n).
+\]
+
+Assim, a Busca de Custo Mínimo considera somente o custo já realizado, enquanto
+a Busca A* utiliza também informações específicas do problema para estimar o
+custo que ainda falta.
+
+Como a heurística escolhida é admissível, a Busca A* preserva a garantia de
+encontrar uma solução ótima. Ao mesmo tempo, a informação heurística pode
+orientar a exploração para regiões mais promissoras do espaço de estados.
+
+A comparação quantitativa entre os quatro algoritmos utilizados no trabalho,
+considerando custo da solução, número de nós expandidos e tempo de
+processamento, será apresentada posteriormente na seção destinada à Tarefa 4.

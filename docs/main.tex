@@ -1,16 +1,30 @@
-\documentclass{IEEEtran}
+\documentclass[conference]{IEEEtran}
 \usepackage[backend=biber, style=authoryear]{biblatex}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
 \usepackage{amsmath}
-\usepackage{lipsum}
-\usepackage{duckuments}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
 \addbibresource{references.bib}
+
 
 \title{TP1 - Fundamentos de IA}
 \author{
-	\IEEEauthorblockA{Pedro Pessoa Santos Brochado} \\
-	\IEEEauthorblockA{
-		\textit{Universidade Federal de Minas Gerais} \\
-	}
+	\IEEEauthorblockN{Diogo Muzzi Mortimer}
+	\IEEEauthorblockA{\textit{Universidade Federal de Minas Gerais}}
+	\IEEEauthorblockA{2022055394}
+	\and
+	\IEEEauthorblockN{Paulo Henrique Soares Gomes}
+	\IEEEauthorblockA{\textit{Universidade Federal de Minas Gerais}}
+	\IEEEauthorblockA{2024433370}
+	\and
+	\IEEEauthorblockN{Pedro Pessoa Santos Brochado}
+	\IEEEauthorblockA{\textit{Universidade Federal de Minas Gerais}}
+	\IEEEauthorblockA{2023093109}
 }
 
 % Conteudo
@@ -19,14 +33,11 @@
 \maketitle
 
 \input{abstract.tex}
-
-% \blindduck[maths=display]
-
-\blindduck[maths=display]
 \input{intro.tex}
 \input{modelagem.tex}
-\input{implementacao.tex}
-\input{analise.tex}
+\input{busca-nao-informada.tex}
+\input{busca-informada.tex}
+\input{comparacao.tex}
 \input{conclusao.tex}
 
 \printbibliography

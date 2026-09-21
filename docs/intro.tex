@@ -1,0 +1,29 @@
+\section{Introdução}
+\label{sec:introducao}
+
+O Problema da Ponte e da Tocha é um quebra-cabeça clássico utilizado no
+estudo de algoritmos de busca em Inteligência Artificial. Um grupo de
+pessoas precisa atravessar uma ponte estreita durante a noite, dispondo de
+apenas uma tocha para iluminar o caminho. A ponte suporta, no máximo, duas
+pessoas por vez, e qualquer travessia -- de ida ou de volta -- exige que a
+tocha esteja com quem está cruzando. Cada pessoa possui um tempo diferente
+de travessia e, quando duas pessoas atravessam juntas, o tempo gasto é
+determinado pela mais lenta delas. O objetivo é encontrar uma sequência de
+travessias que leve todas as pessoas ao lado de destino da ponte no menor
+tempo total possível.
+
+Este trabalho tem como objetivo modelar o problema como um Problema em
+Espaço de Estados e resolvê-lo por meio de diferentes algoritmos de busca,
+comparando suas garantias teóricas e seu comportamento prático. Foram
+implementados dois algoritmos de busca não informada -- Busca em
+Profundidade (DFS) e Busca em Largura (BFS) -- e dois algoritmos que
+utilizam o custo das transições para orientar a exploração do espaço de
+estados -- Busca de Custo Mínimo (UCS) e Busca A*.
+
+O restante do relatório está organizado da seguinte forma: a
+Seção~\ref{sec:modelagem} apresenta a modelagem formal do problema como um
+espaço de estados; as Seções~\ref{sec:busca-nao-informada}
+e~\ref{sec:busca-informada} descrevem a implementação dos quatro algoritmos
+de busca; a Seção~\ref{sec:comparacao-algoritmos} apresenta a comparação
+experimental entre eles; e a última seção conclui o trabalho, retomando os
+principais resultados obtidos.

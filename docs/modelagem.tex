@@ -1,0 +1,98 @@
+\section{Modelagem do Problema}
+\label{sec:modelagem}
+
+Para resolver o problema por meio de algoritmos de busca, ele é modelado como
+um Problema em Espaço de Estados \parencite{poole2010}. Isso exige a definição
+de um conjunto de estados, um estado inicial, um conjunto de ações disponíveis
+para cada estado, uma função sucessora que produz os estados alcançáveis a
+partir de um estado e uma ação, e uma função objetivo que determina se um
+estado é uma solução.
+
+\subsection{Representação dos estados}
+
+Cada estado $s_i \in S$ é representado como uma tripla $s_i = (A, B, \alpha)$,
+sendo:
+\begin{itemize}
+    \item $A$ o conjunto de pessoas do lado de origem da ponte;
+    \item $B$ o conjunto de pessoas do lado de destino da ponte;
+    \item $\alpha$ uma variável booleana que indica se a tocha está do lado
+    $A$ (verdadeira) ou do lado $B$ (falsa).
+\end{itemize}
+
+Na implementação, essa tripla é acrescida de um quarto valor correspondente à
+estimativa heurística do estado, utilizado apenas pela busca A* para
+priorizar a expansão de estados mais promissores; esse valor não faz parte da
+definição formal do estado e não influencia as demais buscas.
+
+\subsection{Estado inicial e estado objetivo}
+
+O estado inicial $s_0 = (P, \{\}, \text{true})$ representa a situação em que
+todas as pessoas $P$ e a tocha estão do lado de origem, e o lado de destino
+está vazio.
+
+Um estado $s_i$ é considerado objetivo quando o lado de origem está vazio, o
+lado de destino não está vazio e a tocha está do lado de destino, isto é,
+$s_i = (\{\}, P, \text{false})$. É essa condição que o programa verifica para
+determinar se a busca alcançou uma solução.
+
+\subsection{Ações possíveis}
+
+Em cada estado, a tocha se encontra em um dos dois lados da ponte, e apenas
+pessoas desse mesmo lado podem se mover. As ações possíveis são a travessia de
+uma ou duas pessoas do lado onde está a tocha para o lado oposto -- nunca mais
+de duas, dada a capacidade da ponte. Chamamos essas ações de
+$q \in \{\mathit{ir}, \mathit{voltar}\}$: $\mathit{ir}$ quando o movimento
+ocorre de $A$ para $B$ (tocha em $A$), e $\mathit{voltar}$ quando ocorre de
+$B$ para $A$ (tocha em $B$). Como a tocha é necessária para enxergar a ponte,
+toda travessia -- de ida ou de volta -- desloca a tocha junto com as pessoas
+que se movem, alternando seu lado a cada ação.
+
+\subsection{Função sucessora}
+
+A função sucessora tem assinatura $F(s_i, p_i, q_i)$, em que $q_i$ é o tipo de
+ação ($\mathit{ir}$ ou $\mathit{voltar}$) e $p_i \subseteq P$ é o conjunto de
+uma ou duas pessoas que atravessam a ponte a partir do estado $s_i$, sempre
+pertencentes ao lado de onde a tocha parte. A função retorna o estado
+resultante de transferir as pessoas de $p_i$ entre os lados $A$ e $B$ e de
+inverter a posição da tocha:
+
+\begin{equation}
+\begin{cases}
+F(s_i, p_i, q_i=\mathit{ir}) = (A \setminus p_i,\; B \cup p_i,\; \text{false})
+\\
+F(s_i, p_i, q_i=\mathit{voltar}) = (A \cup p_i,\; B \setminus p_i,\; \text{true})
+\end{cases}
+\end{equation}
+
+Dado um estado, todos os seus sucessores são obtidos aplicando $F$ a cada
+combinação possível de uma ou duas pessoas do lado onde está a tocha. Como a
+mesma ação pode levar de volta a um estado já visitado (por exemplo, uma
+pessoa que atravessa e depois retorna sozinha), a função sucessora não evita
+ciclos: essa responsabilidade fica a cargo de cada algoritmo de busca, que
+mantém um conjunto de estados já visitados para não reexpandi-los.
+
+\subsection{Custos das transições}
+
+O custo de uma transição corresponde ao tempo gasto na travessia, que é
+determinado pela pessoa mais lenta entre as que atravessam juntas -- já que
+todas as pessoas do grupo cruzam a ponte no mesmo ritmo, limitado por quem
+demora mais. Sendo $t(p)$ o tempo de travessia da pessoa $p$ e $M = p_i$ o
+conjunto de pessoas que se movem em uma ação, o custo dessa transição é dado
+por:
+
+\[
+c(M) = \max_{p \in M} t(p)
+\]
+
+\subsection{Representação do problema como grafo}
+
+O espaço de estados pode ser visto como um grafo direcionado e ponderado, no
+qual cada vértice corresponde a um estado $s_i \in S$ e cada aresta
+corresponde a uma ação válida $F(s_i, p_i, q_i)$ que leva de um estado a
+outro. O peso de cada aresta é o custo $c(M)$ da travessia associada. O grafo
+é direcionado porque as ações de ida e de volta não são simétricas -- a tocha
+precisa estar no lado de origem da ação -- e pode conter ciclos, já que é
+possível retornar a um estado previamente visitado. Resolver o problema
+corresponde, portanto, a encontrar um caminho no grafo entre o vértice que
+representa o estado inicial $s_0$ e algum vértice que satisfaça a condição de
+estado objetivo, sendo o caminho de menor custo total a solução ótima.

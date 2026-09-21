@@ -1,0 +1,64 @@
+\section{Buscas Não Informadas}
+\label{sec:busca-nao-informada}
+
+Nesta etapa foram implementados dois métodos de busca não informada:
+a Busca em Profundidade (\textit{Depth-First Search} ou DFS) e a Busca
+em Largura (\textit{Breadth-First Search} ou BFS). Esses algoritmos exploram o
+espaço de estados utilizando apenas a estrutura de adjacência do
+grafo, sem levar em consideração o custo das arestas ou estimativas
+heurísticas sobre a proximidade do nó ao objetivo.
+
+\subsection{Busca em Profundidade}
+\label{subsec:dfs}
+
+A Busca em Profundidade busca explorar o nó mais profundo (o mais longe do nó inicial)
+presente na fronteira de busca. Caso atinja um estado sem sucessores válidos não visitados, o
+algoritmo realiza o retorna para explorar ramos ainda não explorados.
+
+Para implementar a política LIFO (\textit{Last-In, First-Out}) característica deste
+algoritmo, a fronteira foi estruturada por meio de uma pilha (\texttt{list} em Python).
+Cada entrada na pilha armazena uma tupla contendo o estado atual, a sequência de estados
+que compõem o caminho percorrido desde a raiz e o custo acumulado da trajetória.
+
+Como o espaço de estados do problema da Ponte e da Tocha contém múltiplos ciclos
+(devido à possibilidade de pessoas realizarem travessias repetidas de ida e volta),
+a DFS pura em árvore entraria em laços infinitos. Para garantir a terminação, foi
+adotada a busca em grafo com um conjunto de estados visitados (\texttt{visitados}).
+Um estado é formalmente adicionado a esse conjunto quando é retirado do topo da pilha
+para expansão. Caso um estado retirado já pertença a \texttt{visitados}, ele é descartado.
+
+A cada iteração, verifica-se a condição de parada através do método
+\texttt{is\_estado\_final()}. Ao encontrar a configuração em que todas as pessoas e a
+tocha estão no destino, a busca é finalizada, retornando o
+caminho percorrido, o custo total associado e a quantidade de nós visitados. Além disso,
+a rotina aceita um parâmetro opcional \texttt{limite\_nos}, que encerra a exploração
+caso um número predeterminado de nós expandidos seja ultrapassado, protegendo a execução
+contra buscas excessivamente longas.
+
+Embora a DFS possua complexidade de espaço vantajosa em árvores gerais, em problemas
+ponderados ela não oferece qualquer garantia de otimalidade. Como ela explora o
+primeiro ramo disponível até o nó folha, a solução encontrada frequentemente inclui
+movimentações redundantes e travessias demoradas, resultando em um tempo total de
+travessia muito superior ao mínimo possível.
+
+\subsection{Busca em Largura}
+\label{subsec:bfs}
+
+A Busca em Largura explora o grafo em camadas de profundidade, expandindo
+todos os nós a uma distância de $d$ transições a partir do estado inicial antes de
+avaliar qualquer nó a distância $d+1$.
+
+A política FIFO (\textit{First-In, First-Out}) foi implementada utilizando uma fila
+duplamente encadeada (\texttt{collections.deque}). Diferentemente da DFS, na BFS o
+registro no conjunto de visitados ocorre no momento em que os nós sucessores são gerados
+e enfileirados. Essa estratégia evita a inserção duplicada de estados idênticos em um
+mesmo nível na fronteira, economizando memória de forma substancial.
+
+A condição de parada é testada no momento em que o nó é desenfileirado. Se o estado
+corresponder à meta, o algoritmo retorna a solução. Pela propriedade fundamental da BFS,
+o primeiro caminho encontrado até o objetivo é garantidamente aquele com o
+\textbf{menor número de ações (nós visitados)}, mas não necessariamente o com menor custo.
+Como as travessias possuem custos diferentes (ditados pela pessoa
+mais lenta do movimento), um caminho com menor número de passos pode apresentar um custo
+acumulado significativamente mais alto do que um caminho alternativo com o mesmo número
+de passos ou passos adicionais que sincronize melhor os tempos dos indivíduos.
