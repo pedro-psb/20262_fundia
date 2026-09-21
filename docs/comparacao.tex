@@ -13,9 +13,9 @@ solução (custo total da travessia em minutos), esforço computacional de explo
 Os experimentos foram conduzidos sobre a seguint instância  do problema da Ponte e da
 Tocha, composta por quatro pessoas com os seguintes tempos individuais de travessia:
 
-\[
+\begin{equation}
 	P = \{A: 1\text{ min},\; B: 2\text{ min},\; C: 5\text{ min},\; D: 10\text{ min}\}.
-\]
+\end{equation}
 
 Como o espaço de estados desse problema é compacto e os tempos de busca individuais
 ocorrem na escala de frações de milissegundo, medições isoladas sofrem influência
@@ -26,7 +26,7 @@ ao longo de \textbf{100 repetições independentes}.
 
 As métricas registradas foram:
 \begin{enumerate}
-	\item \textbf{Custo do caminho}: soma dos tempos das ações que compõem a solução encontrada, expressa em minutos ($g(s_{\text{objetivo}})$).
+	\item \textbf{Custo do caminho}: soma dos tempos das ações que compõem a solução encontrada, expressa em minutos ($g(s_f)$).
 	\item \textbf{Nós visitados}: contagem de nós efetivamente retirados da fronteira de busca para teste de objetivo e expansão de sucessores.
 	\item \textbf{Tempo de processamento}: tempo decorrido de CPU durante a execução da busca, medido em milissegundos (ms) por meio da função \texttt{time.perf\_counter()}.
 \end{enumerate}

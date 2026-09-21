@@ -36,7 +36,7 @@ test: ## Roda os testes com pytest
 	uv run pytest src/ponte_tocha/*.py -v
 
 .PHONY: docs
-docs: ## Build-dinamico da documentação/relatorio
+docs: docs-clean  ## Build-dinamico da documentação/relatorio
 	latexmk $(BUILD_OPTS) $(TEX_MAIN) -pvc
 
 .PHONY:
