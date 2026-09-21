@@ -9,7 +9,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
-from ponte_tocha.base import EspacoEstado, Pessoa  # noqa: E402
+from ponte_tocha.base import EspacoEstado, Pessoa, h_max_origem  # noqa: E402
 from ponte_tocha.busca import (  # noqa: E402
     Busca,
     BuscaAEstrela,
@@ -173,7 +173,9 @@ def coletar_estatisticas(
         solucoes_encontradas = 0
 
         for _ in range(n_repeticoes):
-            espaco_estado = EspacoEstado(list(Pessoa.factory(custos_iniciais)))
+            espaco_estado = EspacoEstado(
+                list(Pessoa.factory(custos_iniciais)), fn_heuristica=h_max_origem
+            )
             busca = cls(espaco_estado)
             inicio = time.perf_counter()
             resultado = busca.buscar()

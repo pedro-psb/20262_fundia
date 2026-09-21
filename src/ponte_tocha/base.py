@@ -75,24 +75,27 @@ class Estado(NamedTuple):
         destino_vazio = len(self.destino) == 0
         return origem_nao_vazia and destino_vazio and self.tocha_na_origem
 
-    def get_candidatos(self) -> set[frozenset[Pessoa] | frozenset[Pessoa, Pessoa]]:
+    def get_candidatos(self) -> list[frozenset[Pessoa]]:
         """
-        Retorna a lista de candidatos a atravessar a ponte.
+        Retorna a lista de candidatos a atravessar a ponte, em ordem determinística.
 
-        Um ou duas pessoas podem atravessar a ponte ao mesmo tempo.
+        Um ou duas pessoas podem atravessar a ponte ao mesmo tempo. A ordem
+        não depende da iteração de um ``set`` (que varia com o hash dos
+        objetos): as pessoas são primeiro ordenadas por (custo, id).
 
         Exemplo:
             >>> estado = Estado.new({1,2,3}, {})
             >>> estado.get_candidatos()
-            [{1}, {2}, {3}, {1,2}, {2,3}, {1,3}]
+            [{1}, {2}, {3}, {1,2}, {1,3}, {2,3}]
         """
         lado_com_tocha = self.origem if self.tocha_na_origem else self.destino
-        combinacoes = set()
-        for p_i in lado_com_tocha:
-            combinacoes.add(frozenset((p_i,)))
-            for p_j in lado_com_tocha:
-                combinacoes.add(frozenset((p_i, p_j)))
-        return combinacoes
+        pessoas = sorted(lado_com_tocha, key=lambda p: (p.custo, p.id))
+
+        candidatos = [frozenset((p,)) for p in pessoas]
+        for i, p_i in enumerate(pessoas):
+            for p_j in pessoas[i + 1 :]:
+                candidatos.append(frozenset((p_i, p_j)))
+        return candidatos
 
     def __repr__(self) -> str:
         """Representacao compacta para debugging."""
@@ -141,18 +144,18 @@ class EspacoEstado:
         """Retorna o estado objetivo."""
         return Estado.new(set(), self._pessoas, False, 0)
 
-    def fn_sucessora(self, estado: Estado) -> set[Sucessor]:
-        """Retorna todos os estados de destino possiveis a partir desse.
+    def fn_sucessora(self, estado: Estado) -> list[Sucessor]:
+        """Retorna todos os estados de destino possiveis a partir desse, em ordem determinística.
 
         Não evita ciclos: cabe ao algoritmo de busca controlar quais estados
         já foram visitados.
         """
         if estado.is_estado_final():
-            return set()
+            return []
         combinacoes_movimento = estado.get_candidatos()
-        return {
+        return [
             self.acao_mover(estado, pessoas_a_mover) for pessoas_a_mover in combinacoes_movimento
-        }
+        ]
 
     def acao_mover(self, estado: Estado, pessoas_a_mover: Iterable[Pessoa]) -> Sucessor:
         """Retorna o restulado de mover pessoas partindo do estado atual."""
@@ -237,7 +240,8 @@ class TestEstado:
         candidatos = estado.get_candidatos()
         esperado = {(p1,), (p2,), (p3,), (p1, p2), (p1, p3), (p2, p3)}
         esperado = {frozenset(p) for p in esperado}
-        assert candidatos == esperado
+        assert len(candidatos) == len(esperado)  # sem duplicatas
+        assert set(candidatos) == esperado
 
     def test_transicoes(self): ...
 
@@ -314,20 +318,21 @@ class TestEspacoEstado:
         }
         print()
         pprint(esperado)
-        assert result == esperado
+        assert len(result) == len(esperado)  # sem duplicatas
+        assert set(result) == esperado
 
         # expandir estado s1
         # - a tocha esta no lado B, entao o unico movimento é p1 voltar
         # - isso leva de volta ao estado inicial s0; fn_sucessora não evita esse
         #   ciclo, isso fica a cargo do algoritmo de busca (via seu visitados)
         result = ee.fn_sucessora(s1)
-        assert result == {Sucessor(s0, Movimento.VOLTAR, custo=1)}
+        assert set(result) == {Sucessor(s0, Movimento.VOLTAR, custo=1)}
 
         # expandir estado s2 (simetrico a s1)
         result = ee.fn_sucessora(s2)
-        assert result == {Sucessor(s0, Movimento.VOLTAR, custo=1)}
+        assert set(result) == {Sucessor(s0, Movimento.VOLTAR, custo=1)}
 
         # expandir estado s3
         # o estado é a funcao objetivo, nada mais a expandir
         result = ee.fn_sucessora(s3)
-        assert result == set()
+        assert result == []

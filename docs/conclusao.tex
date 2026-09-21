@@ -1,3 +1,52 @@
 \section{Conclusão}
+\label{sec:conclusao}
 
-\textit{[Escrever aqui a conclusão geral do trabalho.]}
+Este trabalho modelou o Problema da Ponte e da Tocha como um Problema em
+Espaço de Estados e o resolveu por meio de quatro algoritmos de busca --
+DFS, BFS, UCS e A* --, comparando tanto suas garantias teóricas quanto seu
+comportamento prático na instância clássica de quatro pessoas
+$[1, 2, 5, 10]$.
+
+Os resultados obtidos na Seção~\ref{sec:comparacao-algoritmos} confirmam,
+de forma consistente, as propriedades teóricas de cada algoritmo. A DFS,
+por explorar o primeiro ramo disponível sem qualquer critério de custo,
+encontrou a solução mais rapidamente e com o menor número de nós visitados
+($13{,}00$), mas ao custo de uma travessia $90{,}00$ minutos -- mais de
+cinco vezes o valor ótimo --, o que a torna inadequada para este problema.
+A BFS, apesar de garantir a solução com o menor número de passos, também
+não garantiu o menor tempo de travessia ($19{,}00$ minutos), uma vez que
+trata todas as arestas como se tivessem o mesmo custo, ignorando os
+diferentes tempos de travessia de cada pessoa, como demonstrado na
+Seção~\ref{subsec:por-que-bfs-nao-garante-otimo}. Apenas os dois
+algoritmos que incorporam o custo acumulado $g(n)$ à ordenação da
+fronteira -- UCS e A* -- encontraram a solução ótima de $17{,}00$ minutos
+em todas as repetições, o que confirma experimentalmente que a
+otimalidade, nesse problema, depende diretamente de considerar o custo das
+transições, e não apenas a estrutura do grafo.
+
+Entre os dois algoritmos ótimos, a Busca A* se destacou como a opção mais
+eficiente: manteve a mesma garantia de otimalidade da UCS, mas visitando
+apenas $19{,}00$ nós contra $26{,}00$ da UCS, com o menor tempo médio de
+processamento entre ambos. Esse resultado evidencia, na prática, o
+benefício de uma heurística admissível e consistente como $h_{\max}$: ao
+estimar corretamente um limite inferior para o custo restante, o A*
+descarta antecipadamente estados que a UCS ainda precisaria expandir. Como
+discutido na Seção~\ref{subsec:discussao}, essa economia foi modesta no
+problema com quatro pessoas, dado o espaço de estados reduzido, mas é
+esperado que a vantagem do A* sobre a UCS se torne mais expressiva em
+instâncias maiores, nas quais uma fração cada vez menor do espaço de
+estados precisa ser explorada para se comprovar a otimalidade da solução.
+
+De forma geral, o trabalho ilustra um compromisso central no projeto de
+algoritmos de busca: estratégias não informadas como a DFS e a BFS são
+simples de implementar e, no caso da BFS, oferecem garantias sobre o
+número de passos, mas não sobre o custo da solução quando o problema
+possui custos de transição não uniformes. Incorporar o custo acumulado à
+busca, como na UCS, restaura a garantia de otimalidade ao preço de
+explorar a fronteira estritamente por ordem de custo; e adicionar
+informação heurística sobre o problema, como no A*, preserva essa mesma
+garantia enquanto reduz o esforço computacional necessário para alcançá-la.
+Para o Problema da Ponte e da Tocha, portanto, a Busca A* com a heurística
+$h_{\max}$ representa a melhor escolha entre os quatro métodos avaliados,
+por unir a solução de menor tempo de travessia à exploração mais eficiente
+do espaço de estados.

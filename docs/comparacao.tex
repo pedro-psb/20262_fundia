@@ -47,10 +47,10 @@ Tabela~\ref{tab:comparacao-final}.
 		\toprule
 		Algoritmo                   & Solução Ótima? & Custo Médio (min) & Nós Visitados & Tempo Médio (ms) \\
 		\midrule
-		Busca em Profundidade (DFS) & Não            & 50{,}21           & 10{,}64       & 0{,}195          \\
-		Busca em Largura (BFS)      & Não            & 29{,}66           & 26{,}00       & 0{,}390          \\
-		Busca de Custo Mínimo (UCS) & Sim            & 17{,}00           & 26{,}00       & 0{,}398          \\
-		Busca A*                    & Sim            & 17{,}00           & 26{,}00       & 0{,}408          \\
+		Busca em Profundidade (DFS) & Não            & 90{,}00           & 13{,}00       & 0{,}216          \\
+		Busca em Largura (BFS)      & Não            & 19{,}00           & 26{,}00       & 0{,}332          \\
+		Busca de Custo Mínimo (UCS) & Sim            & 17{,}00           & 26{,}00       & 0{,}363          \\
+		Busca A*                    & Sim            & 17{,}00           & 19{,}00       & 0{,}254          \\
 		\bottomrule
 	\end{tabular}
 \end{table*}
@@ -84,9 +84,9 @@ oferecidas por cada família de algoritmos:
 
 \begin{itemize}[leftmargin=1.5cm]
 	\item \textbf{Busca em Profundidade (DFS)}: Apresentou o menor tempo médio de CPU
-	      ($0{,}195\text{ ms}$) e a menor média de nós visitados ($10{,}64$). No entanto, esse
+	      ($0{,}216\text{ ms}$) e a menor média de nós visitados ($13{,}00$). No entanto, esse
 	      desempenho computacional aparece por ter encontrado uma solução sub-ótima mais cedo,
-	      como vemos que o custo médio da travessia foi de $50{,}21\text{ minutos}$, quase três
+	      como vemos que o custo médio da travessia foi de $90{,}00\text{ minutos}$, mais de cinco
 	      vezes superior ao tempo ótimo. Por priorizar a profundidade, a DFS mergulha no
 	      primeiro ramo exploratório disponível e tende a retornar a pessoas que já haviam
 	      atravessado, gerando travessias repetitivas e selecionando pares arbitrários e
@@ -94,31 +94,31 @@ oferecidas por cada família de algoritmos:
 	      envolve a minimização do tempo de travessia.
 
 	\item \textbf{Busca em Largura (BFS)}: Explorou exatamente $26{,}00\text{ nós}$ na
-	      média, com tempo de execução de $0{,}390\text{ ms}$. A BFS cumpre estritamente sua
+	      média, com tempo de execução de $0{,}332\text{ ms}$. A BFS cumpre estritamente sua
 	      propriedade teórica de encontrar a solução com o \textbf{menor número de passos}
 	      (5 travessias no total). Entretanto, o custo médio obtido foi de
-	      $29{,}66\text{ minutos}$, consideravelmente acima do ótimo. Como a BFS é cega em
-	      relação ao tempo dos participantes, ela frequentemente escolhe uma sequência de
-	      5 passos que não emparelha os indivíduos mais lentos de forma estratégica.
+	      $19{,}00\text{ minutos}$, acima do ótimo -- valor que corresponde exatamente ao
+	      caminho subótimo de 5 passos detalhado na Seção~\ref{subsec:por-que-bfs-nao-garante-otimo}.
+	      Como a BFS é cega em relação ao tempo dos participantes, ela escolhe uma sequência
+	      de 5 passos que não emparelha os indivíduos mais lentos de forma estratégica.
 
 	\item \textbf{Busca de Custo Mínimo (UCS)}: Encontrou o custo ótimo de
-	      $17{,}00\text{ minutos}$ em 100\% dos ensaios, consumindo $0{,}398\text{ ms}$ e
+	      $17{,}00\text{ minutos}$ em 100\% dos ensaios, consumindo $0{,}363\text{ ms}$ e
 	      visitando $26{,}00\text{ nós}$. Ao guiar sua fronteira pela função $g(n)$,
 	      o algoritmo assegura que nenhum estado com custo acumulado superior a 17 seja
 	      considerado antes do estado objetivo ideal.
 
 	\item \textbf{Busca A*}: Também alcançou a solução ótima de
-	      $17{,}00\text{ minutos}$, visitando $26{,}00\text{ nós}$ em $0{,}408\text{ ms}$.
-	      A igualdade na quantidade de nós visitados entre A* e UCS decorre da dimensão
-	      compacta do espaço de estados do problema: com 4 pessoas, o grafo possui no
-	      total apenas 32 estados possíveis (dos quais 26 são alcançáveis até a profundidade
-	      da solução). Como a estratégia ótima exige enviar as pessoas mais lentas juntas
-	      ($C$ e $D$, gastando 10 min) e trazer de volta uma pessoa rápida ($A$ ou $B$), a
-	      heurística $h_{\max}$, baseada exclusivamente na pessoa mais lenta remanescente na
-	      origem, atinge seu valor máximo logo no início e não introduz podas adicionais no
-	      reduzido volume de estados intermediários. Em instâncias com maior número de pessoas,
-	      o A* passaria a podar significativamente mais estados do que a UCS graças ao
-	      direcionamento fornecido por $h(n)$.
+	      $17{,}00\text{ minutos}$, porém visitando apenas $19{,}00\text{ nós}$ em
+	      $0{,}254\text{ ms}$ -- menos nós que a UCS e no menor tempo entre os dois métodos
+	      ótimos. Essa diferença evidencia o benefício prático da heurística $h_{\max}$: como
+	      ela estima corretamente que a pessoa mais lenta remanescente na origem ainda
+	      precisará atravessar a ponte, o A* descarta estados cujo custo estimado
+	      $f(n) = g(n) + h(n)$ já excede o custo da melhor solução conhecida, evitando expandir
+	      parte dos estados que a UCS explora integralmente. Ainda assim, como o espaço de
+	      estados do problema com 4 pessoas é pequeno (32 estados no total), a economia
+	      proporcionada pela heurística é modesta; em instâncias com mais pessoas, espera-se
+	      que essa poda se torne ainda mais significativa.
 \end{itemize}
 
 \subsection{Por que a Busca em Largura não garante a solução de menor tempo?}
@@ -159,6 +159,6 @@ No problema com $P = [1, 2, 5, 10]$, o número mínimo absoluto de travessias pa
 	      Custo acumulado total: $2 + 1 + 10 + 2 + 2 = \mathbf{17\text{ minutos}}$.
 \end{enumerate}
 
-Como ambos os caminhos possuem exatamente profundidade 5, ambos pertencem ao mesmo nível na árvore de busca da BFS. Como a BFS organiza sua fronteira exclusivamente pela ordem de chegada dos nós na fila FIFO, o primeiro estado objetivo desenfileirado dependerá unicamente da ordem arbitrária em que os sucessores foram gerados e inseridos na fila -- e não do tempo acumulado. Por isso, a BFS frequentemente retorna uma solução de 19, 29 ou mais minutos.
+Como ambos os caminhos possuem exatamente profundidade 5, ambos pertencem ao mesmo nível na árvore de busca da BFS. Como a BFS organiza sua fronteira exclusivamente pela ordem de chegada dos nós na fila FIFO, o primeiro estado objetivo desenfileirado dependerá unicamente da ordem arbitrária em que os sucessores foram gerados e inseridos na fila -- e não do tempo acumulado. Por isso, a BFS pode retornar uma solução subótima de 19, 29 ou mais minutos; nos experimentos da Seção~\ref{subsec:resultados}, o caminho subótimo de 19 minutos foi o encontrado em todas as repetições.
 
 Em contrapartida, a \textbf{Busca de Custo Mínimo} organiza a fronteira em ordem crescente de $g(n)$, e a \textbf{Busca A*} organiza por $f(n) = g(n) + h(n)$. Sendo todos os custos de aresta não negativos e sendo a heurística $h(n)$ admissível (ou seja, $h(n) \leq h^*(n)$), ambos os algoritmos possuem a garantia matemática formal de que nenhum nó com custo real superior a 17 minutos será expandido antes que o caminho de custo mínimo seja selecionado, garantindo a solução ótima.

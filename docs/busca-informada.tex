@@ -79,10 +79,7 @@ A função utilizada é
 
 A ideia é considerar o tempo da pessoa mais lenta que ainda precisa sair do
 lado inicial. Como todos os tempos de travessia são positivos, tem-se também
-
-\begin{equation}
-	h(n)\geq 0.
-\end{equation}
+$h(n)\geq 0$.
 
 Essa propriedade é compatível com a interpretação de $h(n)$ como uma
 estimativa do custo restante. Entretanto, a condição essencial para garantir
@@ -140,19 +137,8 @@ restante. Para cada estado é calculado
 	f(n)=g(n)+h(n),
 \end{equation}
 
-em que
-
-\begin{equation}
-	g(n)
-\end{equation}
-
-representa o custo real já gasto para alcançar o estado, enquanto
-
-\begin{equation}
-	h(n)
-\end{equation}
-
-representa uma estimativa do custo restante até o objetivo.
+em que $g(n)$ representa o custo real já gasto para alcançar o estado, enquanto
+$h(n)$ representa uma estimativa do custo restante até o objetivo.
 
 A fronteira do A*, também implementada como fila de prioridade, utiliza
 $f(n)$ para determinar qual estado será analisado primeiro. Assim,
@@ -171,10 +157,7 @@ conhecida, o estado pode ser inserido novamente na fila.
 
 Como o objeto que representa um estado também contém o valor da heurística,
 foi utilizada como identificação lógica da configuração a tupla
-
-\begin{equation}
-	(\text{origem},\text{destino},\text{posição da tocha}).
-\end{equation}
+$(\text{origem},\text{destino},\text{posição da tocha})$.
 
 Essa escolha evita que duas configurações equivalentes sejam interpretadas
 como estados distintos apenas por apresentarem valores diferentes no campo da
@@ -213,11 +196,7 @@ Para a instância clássica do problema,
 	[1,2,5,10],
 \end{equation}
 
-os dois algoritmos encontraram uma solução de custo total igual a
-
-\begin{equation}
-	17 \text{ minutos}.
-\end{equation}
+os dois algoritmos encontraram uma solução de custo total igual a 17 \text{ minutos}.
 
 Além da comparação dos custos finais, foram verificados os caminhos retornados
 pelos algoritmos. Os testes confirmam que a posição da tocha é alternada após
@@ -225,11 +204,7 @@ cada movimento, que são movimentadas uma ou duas pessoas por travessia e que a
 soma dos custos das transições coincide com o custo total informado pela
 busca.
 
-Também foi testada a Busca A* utilizando uma heurística nula,
-
-\begin{equation}
-	h(n)=0.
-\end{equation}
+Também foi testada a Busca A* utilizando uma heurística nula, $h(n)=0$.
 
 Nesse caso,
 
@@ -249,18 +224,8 @@ transições consideradas.
 
 A principal diferença entre os dois algoritmos está no critério utilizado para
 ordenar a fronteira.
-
-Na Busca de Custo Mínimo,
-
-\begin{equation}
-	\text{prioridade}(n)=g(n),
-\end{equation}
-
-enquanto na Busca A*,
-
-\begin{equation}
-	\text{prioridade}(n)=g(n)+h(n).
-\end{equation}
+Na Busca de Custo Mínimo, $\text{prioridade}(n)=g(n)$,
+enquanto na Busca A*, $\text{prioridade}(n)=g(n)+h(n)$.
 
 Assim, a Busca de Custo Mínimo considera somente o custo já realizado, enquanto
 a Busca A* utiliza também informações específicas do problema para estimar o

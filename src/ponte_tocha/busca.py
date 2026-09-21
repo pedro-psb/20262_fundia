@@ -23,7 +23,6 @@ class ResultadoBusca:
 class Busca(ABC):
     def __init__(self, espaco_estado: EspacoEstado):
         self._espaco_estado = espaco_estado
-        self._visitados: set[Estado] = set()  # para evitar ciclos
 
     @abstractmethod
     def buscar(self) -> ResultadoBusca | None:
@@ -148,14 +147,25 @@ class BuscaDeCustoUniforme(Busca):
 
         fronteira = [(0, next(contador), estado_inicial, [estado_inicial])]
 
-        melhor_custo = {estado_inicial: 0}
+        # A heurística não faz parte da identidade lógica do estado.
+        chave_inicial = (
+            estado_inicial.origem,
+            estado_inicial.destino,
+            estado_inicial.tocha_na_origem,
+        )
+        melhor_custo = {chave_inicial: 0}
 
         nos_visitados = 0
 
         while fronteira:
             custo_atual, _, estado_atual, caminho = heapq.heappop(fronteira)
+            chave_atual = (
+                estado_atual.origem,
+                estado_atual.destino,
+                estado_atual.tocha_na_origem,
+            )
 
-            if custo_atual != melhor_custo.get(estado_atual):
+            if custo_atual != melhor_custo.get(chave_atual):
                 continue
 
             nos_visitados += 1
@@ -174,14 +184,19 @@ class BuscaDeCustoUniforme(Busca):
 
             for sucessor in sucessores:
                 novo_custo = custo_atual + sucessor.custo
+                chave_sucessor = (
+                    sucessor.estado.origem,
+                    sucessor.estado.destino,
+                    sucessor.estado.tocha_na_origem,
+                )
 
                 custo_conhecido = melhor_custo.get(
-                    sucessor.estado,
+                    chave_sucessor,
                     float("inf"),
                 )
 
                 if novo_custo < custo_conhecido:
-                    melhor_custo[sucessor.estado] = novo_custo
+                    melhor_custo[chave_sucessor] = novo_custo
 
                     heapq.heappush(
                         fronteira,

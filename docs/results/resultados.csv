@@ -1,5 +1,5 @@
 algoritmo,encontrou_solucao,custo_caminho,nos_visitados,tempo_s,n_repeticoes
-BuscaEmLargura,True,29.66,26.0,0.00039034979989082785,100
-BuscaEmProfundidade,True,50.21,10.64,0.000194840649892285,100
-BuscaDeCustoUniforme,True,17.0,26.0,0.00039841158028139037,100
-BuscaAEstrela,True,17.0,26.0,0.0004079474999525701,100
+BuscaEmLargura,True,19.0,26.0,0.0003323976605315693,100
+BuscaEmProfundidade,True,90.0,13.0,0.00021566514828009532,100
+BuscaDeCustoUniforme,True,17.0,26.0,0.0003632147004827857,100
+BuscaAEstrela,True,17.0,19.0,0.00025393224073923194,100
