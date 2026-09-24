@@ -1,0 +1,42 @@
+name: CI TP1
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "tp1/**"
+      - ".python-version"
+      - ".github/workflows/ci-tp1.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "tp1/**"
+      - ".python-version"
+      - ".github/workflows/ci-tp1.yml"
+
+defaults:
+  run:
+    working-directory: tp1
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: "tp1/uv.lock"
+      - run: uv sync
+      - run: make lint
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: "tp1/uv.lock"
+      - run: uv sync
+      - run: make test

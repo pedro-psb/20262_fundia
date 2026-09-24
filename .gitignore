@@ -12,3 +12,5 @@ _build
 *.log
 *.pdf
 *.zip
+*.helix
+.analise.stamp

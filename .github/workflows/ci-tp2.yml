@@ -1,10 +1,22 @@
-name: CI
+name: CI TP2
 
 on:
   push:
     branches: [main]
+    paths:
+      - "tp2/**"
+      - ".python-version"
+      - ".github/workflows/ci-tp2.yml"
   pull_request:
     branches: [main]
+    paths:
+      - "tp2/**"
+      - ".python-version"
+      - ".github/workflows/ci-tp2.yml"
+
+defaults:
+  run:
+    working-directory: tp2
 
 jobs:
   lint:
@@ -14,6 +26,7 @@ jobs:
       - uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
+          cache-dependency-glob: "tp2/uv.lock"
       - run: uv sync
       - run: make lint
 
@@ -24,5 +37,6 @@ jobs:
       - uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
+          cache-dependency-glob: "tp2/uv.lock"
       - run: uv sync
       - run: make test
