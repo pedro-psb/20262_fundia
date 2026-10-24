@@ -11,16 +11,28 @@
 \usepackage[hidelinks]{hyperref}
 \addbibresource{references.bib}
 
-% Caixa provisória para figuras ainda não geradas. Substitua por
-% \includegraphics{results/...} quando o gráfico existir.
+% Caixa provisória para figuras ainda não geradas.
 % Uso: \placeholder{descrição}  ou  \placeholder[\textwidth]{descrição}
 \newcommand{\placeholder}[2][\columnwidth]{%
 	\fbox{\parbox[c][3cm][c]{\dimexpr#1-2\fboxsep-2\fboxrule\relax}{%
 			\centering\footnotesize\textit{#2}}}}
 
+% Tabelas e figuras finais, geradas por `make analise` em results/final/.
+% Figura: \figuraresultado[largura]{arquivo.png}{descrição}; sem o arquivo, usa o placeholder.
+\newcommand{\figuraresultado}[3][\columnwidth]{%
+	\IfFileExists{results/final/#2}%
+	{\includegraphics[width=#1]{results/final/#2}}%
+	{\placeholder[#1]{#3}}}
+% Linhas de uma tabela, entre \midrule e \bottomrule: \linhasresultado{tab-principal}.
+% Usa o \input primitivo, que funciona dentro de um tabular.
+\makeatletter
+\newcommand{\linhasresultado}[1]{\@@input results/final/#1.tex }
+\makeatother
+
 % Convenções:
 %   - rótulos com prefixo: sec:, subsec:, fig:, tab:, eq:
-%   - figuras geradas por código ficam em results/ (ver README, "Reprodução")
+%   - tabelas e figuras geradas por código ficam em results/final/ (ver README,
+%     "Reprodução"); os CSVs brutos ficam em results/raw/
 %   - orçamento total sugerido pelo enunciado: ~5 páginas sem anexos;
 %     figuras extras vão para anexos.tex
 

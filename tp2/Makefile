@@ -6,9 +6,10 @@ TEX_FILES = $(TEX_WORKDIR)/*.tex
 TEX_MAIN = $(TEX_WORKDIR)/main.tex
 ZIP_FILE = $(CURDIR)/tp2.zip
 RESULTS_DIR = $(TEX_WORKDIR)/results
-DADOS_DIR = $(TEX_WORKDIR)/resultados
-SRC_FILES = $(wildcard $(CURDIR)/src/tp2/*.py)
-ANALISE_STAMP = $(RESULTS_DIR)/.analise.stamp
+RAW_DIR = $(RESULTS_DIR)/raw
+FINAL_DIR = $(RESULTS_DIR)/final
+SRC_FILES = $(wildcard $(CURDIR)/src/tp2/*.py $(CURDIR)/src/tp2/algoritmos/*.py)
+ANALISE_STAMP = $(FINAL_DIR)/.analise.stamp
 
 # Imagem TeX Live usada no build final (https://github.com/xu-cheng/latex-docker)
 LATEX_IMAGE ?= ghcr.io/xu-cheng/texlive-full:latest
@@ -37,35 +38,47 @@ lint: ## Roda o linter (ruff)
 test: ## Roda os testes com pytest
 	uv run pytest tests -v
 
-# Experimentos: cada alvo grava seus CSVs em docs/resultados.
+# Experimentos: cada alvo grava seus CSVs brutos em docs/results/raw.
+# RUN_ARGS repassa opções ao `tp2 run`, ex.: make resultado-todos RUN_ARGS="--execucoes 2 --orcamento 3000"
+RUN_ARGS ?=
+
+.PHONY: verificar
+verificar: ## Imprime os valores de verificacao de h (identidade e guloso)
+	uv run tp2 run verificar
 
 .PHONY: resultado-aleatoria
 resultado-aleatoria: ## Roda a busca aleatoria (valida o formato dos CSVs)
-	uv run python -m tp2.experimento aleatoria -o $(DADOS_DIR)
+	uv run tp2 run aleatoria $(RUN_ARGS) -o $(RAW_DIR)
 
 .PHONY: resultado-local
-resultado-local: ## Roda a busca local (GD + random restart, vizinhancas, incremental)
-	uv run python -m tp2.experimento local -o $(DADOS_DIR)
+resultado-local: ## Roda a busca local (variantes, vizinhancas e tempo da avaliacao incremental)
+	uv run tp2 run gd-best $(RUN_ARGS) -o $(RAW_DIR)
+	uv run tp2 run gd-first $(RUN_ARGS) -o $(RAW_DIR)
+	uv run tp2 run gd-aleatorio $(RUN_ARGS) -o $(RAW_DIR)
+	uv run tp2 run gd-first --operador insertion $(RUN_ARGS) -o $(RAW_DIR)
+	uv run tp2 run gd-first --operador 2-opt $(RUN_ARGS) -o $(RAW_DIR)
+	uv run tp2 run incremental $(RUN_ARGS) -o $(RAW_DIR)
 
 .PHONY: resultado-tempera
 resultado-tempera: ## Roda o simulated annealing
-	uv run python -m tp2.experimento tempera -o $(DADOS_DIR)
+	uv run tp2 run tempera $(RUN_ARGS) -o $(RAW_DIR)
 
 .PHONY: resultado-genetico
-resultado-genetico: ## Roda o algoritmo genetico e o experimento adicional
-	uv run python -m tp2.experimento genetico -o $(DADOS_DIR)
+resultado-genetico: ## Roda o algoritmo genetico e o experimento adicional (sem cruzamento)
+	uv run tp2 run genetico $(RUN_ARGS) -o $(RAW_DIR)
+	uv run tp2 run genetico-sem-cruzamento $(RUN_ARGS) -o $(RAW_DIR)
 
 .PHONY: resultado-todos
-resultado-todos: resultado-local resultado-tempera resultado-genetico ## Rodada final completa
+resultado-todos: resultado-aleatoria resultado-local resultado-tempera resultado-genetico ## Rodada final completa
 
 .PHONY: resultado-figuras
-resultado-figuras: analise ## Gera as figuras a partir dos CSVs (alias de analise)
+resultado-figuras: analise ## Gera tabelas-resumo e figuras a partir dos CSVs (alias de analise)
 
 .PHONY: analise
-analise: $(ANALISE_STAMP) ## Gera os graficos da analise em docs/results (usados no relatorio)
+analise: $(ANALISE_STAMP) ## Gera tabelas e figuras do relatorio em docs/results/final
 
-$(ANALISE_STAMP): $(SRC_FILES) $(wildcard $(DADOS_DIR)/*.csv)
-	uv run python -m tp2.analise -o $(RESULTS_DIR)
+$(ANALISE_STAMP): $(SRC_FILES) $(wildcard $(RAW_DIR)/*.csv)
+	uv run tp2 tratar-resultados $(RAW_DIR) -o $(FINAL_DIR)
 	touch $@
 
 .PHONY: docs
@@ -82,8 +95,8 @@ docs-live: docs-clean analise ## Build-dinamico da documentacao/relatorio (nativ
 	cd $(TEX_WORKDIR) && latexmk -pvc
 
 .PHONY: docs-clean
-docs-clean: ## Remove os artefatos de build do relatorio e os graficos gerados
-	rm -rf $(BUILD_DIR) $(OUT_DIR) $(RESULTS_DIR)
+docs-clean: ## Remove os artefatos de build do relatorio e as tabelas/figuras finais
+	rm -rf $(BUILD_DIR) $(OUT_DIR) $(FINAL_DIR)
 
 .PHONY: docs-format
 docs-format: ## Formata os arquivos .tex com latexindent

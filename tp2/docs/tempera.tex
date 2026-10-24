@@ -28,9 +28,7 @@
 		\toprule
 		Instância     & $\overline{\Delta^+}$ & $T_0$ & $T_f$ & $\alpha$ & Iter./$T$ \\
 		\midrule
-		pequena       & --                    & --    & --    & --       & --        \\
-		intermediária & --                    & --    & --    & --       & --        \\
-		grande        & --                    & --    & --    & --       & --        \\
+		\linhasresultado{tab-sa-parametros}
 		\bottomrule
 	\end{tabular}
 \end{table}
@@ -41,9 +39,9 @@
 
 \begin{figure}[H]
 	\centering
-	\placeholder{Taxa de aceitação de pioras (janela móvel) x avaliações
+	\figuraresultado{sa_aceitacao.png}{Taxa de aceitação de pioras (janela móvel) x avaliações
 		(mediana das execuções), uma curva por instância; T em eixo secundário
-		opcional. Arquivo: results/sa\_aceitacao.png}
+		opcional.}
 	\caption{Taxa de aceitação de movimentos piores ao longo da execução do
 		simulated annealing.}
 	\label{fig:sa-aceitacao}

@@ -31,6 +31,7 @@ jobs:
       - run: make lint
 
   test:
+    needs: lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -40,3 +41,42 @@ jobs:
           cache-dependency-glob: "tp2/uv.lock"
       - run: uv sync
       - run: make test
+
+  resultados:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: "tp2/uv.lock"
+      - run: uv sync
+      - run: make verificar
+      - run: make resultado-todos
+      - uses: actions/upload-artifact@v4
+        with:
+          name: resultados-tp2
+          path: tp2/docs/results/raw/
+          if-no-files-found: error
+
+  relatorio:
+    needs: resultados
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: "tp2/uv.lock"
+      - run: uv sync
+      - uses: actions/download-artifact@v4
+        with:
+          name: resultados-tp2
+          path: tp2/docs/results/raw/
+      - run: make docs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: relatorio-tp2
+          path: tp2/pdf/main.pdf
+          if-no-files-found: error

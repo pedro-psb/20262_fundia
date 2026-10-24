@@ -16,26 +16,16 @@
 		\toprule
 		Instância     & Algoritmo & Média $\pm$ dp & Mediana & Mínimo & Gap médio & Gap mínimo \\
 		\midrule
-		pequena       & GD+RR     & --             & --      & --     & --        & --         \\
-		              & SA        & --             & --      & --     & --        & --         \\
-		              & AG        & --             & --      & --     & --        & --         \\
-		\midrule
-		intermediária & GD+RR     & --             & --      & --     & \multicolumn{2}{c}{--} \\
-		              & SA        & --             & --      & --     & \multicolumn{2}{c}{--} \\
-		              & AG        & --             & --      & --     & \multicolumn{2}{c}{--} \\
-		\midrule
-		grande        & GD+RR     & --             & --      & --     & \multicolumn{2}{c}{--} \\
-		              & SA        & --             & --      & --     & \multicolumn{2}{c}{--} \\
-		              & AG        & --             & --      & --     & \multicolumn{2}{c}{--} \\
+		\linhasresultado{tab-principal}
 		\bottomrule
 	\end{tabular}
 \end{table*}
 
 \begin{figure*}[t]
 	\centering
-	\placeholder[\textwidth]{Boxplots do melhor $h$: três painéis (pequena,
+	\figuraresultado[\textwidth]{boxplots.png}{Boxplots do melhor $h$: três painéis (pequena,
 		intermediária, grande), três caixas por painel (GD+RR, SA, AG); linha
-		tracejada com o valor de referência. Arquivo: results/boxplots.png}
+		tracejada com o valor de referência.}
 	\caption{Distribuição do melhor $h$ por algoritmo em cada instância.}
 	\label{fig:boxplots}
 \end{figure*}
@@ -51,9 +41,7 @@
 		\toprule
 		Instância     & GD $\times$ SA & GD $\times$ AG & SA $\times$ AG \\
 		\midrule
-		pequena       & --             & --             & --             \\
-		intermediária & --             & --             & --             \\
-		grande        & --             & --             & --             \\
+		\linhasresultado{tab-pvalores}
 		\bottomrule
 	\end{tabular}
 \end{table}
@@ -63,10 +51,10 @@
 
 \begin{figure*}[t]
 	\centering
-	\placeholder[\textwidth]{Curvas de convergência: três painéis (um por
+	\figuraresultado[\textwidth]{convergencia.png}{Curvas de convergência: três painéis (um por
 		instância); eixo x = avaliações, eixo y = melhor $h$ (mediana das
 		execuções); uma curva por algoritmo + curva da média da população do
-		AG. Arquivo: results/convergencia.png}
+		AG.}
 	\caption{Melhor $h$ em função do número de avaliações.}
 	\label{fig:convergencia}
 \end{figure*}
@@ -83,7 +71,7 @@
 		\toprule
 		Instância & Algoritmo & Avaliações & Tempo (s) & Aval./s \\
 		\midrule
-		--        & --        & --         & --        & --      \\
+		\linhasresultado{tab-tempo}
 		\bottomrule
 	\end{tabular}
 \end{table}
