@@ -1,0 +1,77 @@
+% Enunciado: Seções 2.1, 2.2, 3 e T1
+% Tamanho sugerido: ~2/3 de coluna
+
+\section{Metodologia}
+\label{sec:metodologia}
+
+% Arquitetura: os algoritmos só conhecem a interface da
+% Tabela~\ref{tab:interface}; a contagem de avaliações de h é instrumentada
+% em um único ponto e a execução para exatamente ao atingir o orçamento B.
+
+\begin{table}[H]
+	\centering
+	\caption{Interface comum entre problema e algoritmos.}
+	\label{tab:interface}
+	\begin{tabular}{ll}
+		\toprule
+		Método                          & Papel \\
+		\midrule
+		\texttt{solucao\_aleatoria()}   & --    \\
+		\texttt{h(s)}                   & --    \\
+		\texttt{sucessores(s)}          & --    \\
+		\texttt{sucessor\_aleatorio(s)} & --    \\
+		\texttt{cruzamento(s1, s2)}     & --    \\
+		\texttt{mutacao(s)}             & --    \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+% Operadores de vizinhança: swap, insertion e 2-opt, com um exemplo curto
+% de cada e o tamanho da vizinhança em função de n
+% (Tabela~\ref{tab:tamanho-vizinhancas}). A escolha da vizinhança usada nos
+% experimentos fica na Seção~\ref{subsec:busca-local}.
+
+\begin{table}[H]
+	\centering
+	\caption{Tamanho da vizinhança induzida por cada operador.}
+	\label{tab:tamanho-vizinhancas}
+	\begin{tabular}{lcccc}
+		\toprule
+		Operador  & $|N(\pi)|$ & $n=12$ & $n=50$ & $n=150$ \\
+		\midrule
+		Swap      & --         & --     & --     & --      \\
+		Insertion & --         & --     & --     & --      \\
+		2-opt     & --         & --     & --     & --      \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+% Verificação da função de avaliação: saída real do programa (bloco
+% verbatim curto) para a permutação identidade na instância pequena
+% (h = 4366) e para o exemplo da Figura 1 do enunciado (h = 39, ótimo
+% h = 22). Citar o teste automático que garante esses valores.
+
+% Protocolo dos experimentos (Tabela~\ref{tab:instancias}):
+% - recurso contabilizado: avaliações de h (cada sucessor examinado e cada
+%   indivíduo avaliado conta 1);
+% - sementes e reprodutibilidade; o que é gravado em disco por execução;
+% - ambiente: CPU, versão do Python, sistema operacional.
+
+\begin{table}[H]
+	\centering
+	\caption{Instâncias, orçamento e número de execuções independentes.}
+	\label{tab:instancias}
+	\begin{tabular}{lccccc}
+		\toprule
+		Instância     & $n$ & $\sum p_j$ & $h_{\text{ref}}$ & $B$ & Execuções \\
+		\midrule
+		pequena       & 12  & --         & --               & --  & --        \\
+		intermediária & 50  & --         & --               & --  & --        \\
+		grande        & 150 & --         & --               & --  & --        \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+% Análise estatística: estatísticas reportadas (média, dp, mínimo e mediana
+% do melhor h), teste de Mann--Whitney par a par, nível de significância e
+% se há correção para comparações múltiplas.

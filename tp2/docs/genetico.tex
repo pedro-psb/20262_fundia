@@ -1,0 +1,62 @@
+% Enunciado: Seção 2.5
+% Tamanho sugerido: ~1/2 coluna
+
+\subsection{Algoritmo Genético}
+\label{subsec:genetico}
+
+% Codificação e operadores:
+% - Cromossomo = permutação; gene = posição; alelo = ativo (Figura 2 do
+%   enunciado). Inicialização aleatória de N indivíduos.
+% - Seleção: torneio (ou roleta). Explicar a conversão do custo h em
+%   aptidão adequada ao operador escolhido.
+% - Mutação: operador (escolhido aqui, independente da vizinhança da
+%   busca local) e taxa Pm. Elitismo: quantos indivíduos.
+% - Parada por orçamento: como se trata a última geração incompleta.
+% - Parâmetros e como foram escolhidos (Tabela~\ref{tab:ag-parametros}).
+
+% Cruzamento:
+% - Por que cruzamentos de 1 ou k pontos não servem (ativos duplicados).
+% - Operador escolhido (OX, PMX ou por arestas) com exemplo numérico passo
+%   a passo (Tabela~\ref{tab:ag-cruzamento}).
+
+\begin{table}[H]
+	\centering
+	\caption{Exemplo passo a passo do cruzamento adotado.}
+	\label{tab:ag-cruzamento}
+	\begin{tabular}{ll}
+		\toprule
+		Etapa                   & Permutação \\
+		\midrule
+		Pai 1                   & --         \\
+		Pai 2                   & --         \\
+		Segmento herdado        & --         \\
+		Preenchimento           & --         \\
+		Filho                   & --         \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\begin{table}[H]
+	\centering
+	\caption{Parâmetros do algoritmo genético por instância.}
+	\label{tab:ag-parametros}
+	\begin{tabular}{lccccc}
+		\toprule
+		Instância     & $N$ & $P_c$ & $P_m$ & Torneio & Elite \\
+		\midrule
+		\linhasresultado{tab-ag-parametros}
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+% Diversidade da população (Figura~\ref{fig:ag-diversidade}):
+% - Métrica usada (cromossomos distintos ou distância média entre pares).
+% - Diagnóstico com dados: há convergência prematura? Em que geração?
+
+\begin{figure}[H]
+	\centering
+	\figuraresultado{ag_diversidade.png}{Diversidade da população x geração (mediana das execuções),
+		uma curva por instância.}
+	\caption{Evolução da diversidade da população do algoritmo genético.}
+	\label{fig:ag-diversidade}
+\end{figure}
