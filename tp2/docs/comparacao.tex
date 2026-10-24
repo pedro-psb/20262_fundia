@@ -1,42 +1,89 @@
-\section{Comparação dos Algoritmos}
-\label{sec:comparacao-algoritmos}
+% Enunciado: Seção 5, itens 1--5
+% Tamanho sugerido: ~1 página (figuras de largura dupla)
 
-% Compare os métodos experimentalmente. Os resultados devem ser
-% reprodutíveis: o leitor precisa saber o que foi medido, em quais
-% instâncias e em quantas repetições.
-\lipsum[15]
+\subsection{Comparação dos algoritmos}
+\label{subsec:comparacao}
 
-\subsection{Metodologia}
-\label{subsec:metodologia}
-% Descreva instâncias, métricas, número de repetições e ambiente de
-% execução. Os gráficos são gerados por `make analise`.
-\lipsum[16]
+% Qualidade das soluções: apresentar a Tabela~\ref{tab:principal} e a
+% Figura~\ref{fig:boxplots}.
 
-\subsection{Resultados}
-\label{subsec:resultados}
-% Apresente os números (tabela e/ou gráficos) sem interpretá-los ainda.
-% Toda figura/tabela deve ser referenciada no texto e ter legenda
-% autoexplicativa.
-\lipsum[17][1-4] A Figura~\ref{fig:grafico-barras} e a
-Figura~\ref{fig:grafico-linhas} \lipsum[17][5-6]
-
-\begin{figure}[H]
+\begin{table*}[t]
 	\centering
-	\includegraphics[width=\columnwidth]{results/grafico_barras.png}
-	\caption{Legenda do gráfico de barras.}
-	\label{fig:grafico-barras}
-\end{figure}
+	\caption{Melhor $h$ por combinação algoritmo $\times$ instância. Gap em
+		relação a $h^\star = 1875$ apenas na instância pequena.}
+	\label{tab:principal}
+	\begin{tabular}{llccccc}
+		\toprule
+		Instância     & Algoritmo & Média $\pm$ dp & Mediana & Mínimo & Gap médio & Gap mínimo \\
+		\midrule
+		pequena       & GD+RR     & --             & --      & --     & --        & --         \\
+		              & SA        & --             & --      & --     & --        & --         \\
+		              & AG        & --             & --      & --     & --        & --         \\
+		\midrule
+		intermediária & GD+RR     & --             & --      & --     & \multicolumn{2}{c}{--} \\
+		              & SA        & --             & --      & --     & \multicolumn{2}{c}{--} \\
+		              & AG        & --             & --      & --     & \multicolumn{2}{c}{--} \\
+		\midrule
+		grande        & GD+RR     & --             & --      & --     & \multicolumn{2}{c}{--} \\
+		              & SA        & --             & --      & --     & \multicolumn{2}{c}{--} \\
+		              & AG        & --             & --      & --     & \multicolumn{2}{c}{--} \\
+		\bottomrule
+	\end{tabular}
+\end{table*}
 
-\begin{figure}[H]
+\begin{figure*}[t]
 	\centering
-	\includegraphics[width=\columnwidth]{results/grafico_linhas.png}
-	\caption{Legenda do gráfico de linhas.}
-	\label{fig:grafico-linhas}
-\end{figure}
+	\placeholder[\textwidth]{Boxplots do melhor $h$: três painéis (pequena,
+		intermediária, grande), três caixas por painel (GD+RR, SA, AG); linha
+		tracejada com o valor de referência. Arquivo: results/boxplots.png}
+	\caption{Distribuição do melhor $h$ por algoritmo em cada instância.}
+	\label{fig:boxplots}
+\end{figure*}
 
-\subsection{Discussão}
-\label{subsec:discussao}
-% Interprete os resultados à luz das propriedades teóricas da
-% Seção~\ref{sec:modelagem} em diante: o comportamento observado era
-% esperado? Explique discrepâncias e limitações dos experimentos.
-\lipsum[18]
+% Testes de hipótese: um p-valor para cada comparação par a par afirmada no
+% texto (Tabela~\ref{tab:pvalores}).
+
+\begin{table}[H]
+	\centering
+	\caption{Mann--Whitney par a par (p-valor; algoritmo melhor entre parênteses).}
+	\label{tab:pvalores}
+	\begin{tabular}{lccc}
+		\toprule
+		Instância     & GD $\times$ SA & GD $\times$ AG & SA $\times$ AG \\
+		\midrule
+		pequena       & --             & --             & --             \\
+		intermediária & --             & --             & --             \\
+		grande        & --             & --             & --             \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+% Convergência: descrever as curvas da Figura~\ref{fig:convergencia}; a
+% leitura da distância melhor x média do AG entra nas subseções seguintes.
+
+\begin{figure*}[t]
+	\centering
+	\placeholder[\textwidth]{Curvas de convergência: três painéis (um por
+		instância); eixo x = avaliações, eixo y = melhor $h$ (mediana das
+		execuções); uma curva por algoritmo + curva da média da população do
+		AG. Arquivo: results/convergencia.png}
+	\caption{Melhor $h$ em função do número de avaliações.}
+	\label{fig:convergencia}
+\end{figure*}
+
+% Tempo de execução: mesma contagem de avaliações, tempos de parede
+% diferentes (Tabela~\ref{tab:tempo}); de onde vem a diferença (avaliação
+% incremental, overhead de população etc.).
+
+\begin{table}[H]
+	\centering
+	\caption{Tempo médio de parede por execução e avaliações.}
+	\label{tab:tempo}
+	\begin{tabular}{llccc}
+		\toprule
+		Instância & Algoritmo & Avaliações & Tempo (s) & Aval./s \\
+		\midrule
+		--        & --        & --         & --        & --      \\
+		\bottomrule
+	\end{tabular}
+\end{table}

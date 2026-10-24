@@ -1,0 +1,73 @@
+% Enunciado: Seções 2.3, 3 (avaliação incremental) e T2
+% Tamanho sugerido: ~1/2 coluna
+
+\subsection{Greedy Descent com Random Restart}
+\label{subsec:busca-local}
+
+% Algoritmo e variantes:
+% - Descida gulosa até ótimo local; random restart guardando a melhor
+%   solução, até esgotar o orçamento. Prosa curta, sem pseudocódigo longo.
+% - Variantes implementadas (mínimo duas): best improvement, first
+%   improvement, sucessor aleatório com aceitação de melhora.
+% - Deixar claro como a avaliação da solução corrente entra na contagem.
+
+% Avaliação incremental:
+% - Ideia: só o sufixo a partir da primeira posição alterada muda; reusar
+%   os C_k e o atraso acumulado do prefixo.
+% - Em qual(is) vizinhança(s) foi implementada; teste automático que
+%   compara com a avaliação completa; ganho de tempo medido
+%   (Tabela~\ref{tab:incremental}). A contagem de avaliações não muda.
+
+\begin{table}[H]
+	\centering
+	\caption{Tempo médio por avaliação: completa x incremental.}
+	\label{tab:incremental}
+	\begin{tabular}{llccc}
+		\toprule
+		Instância & Operador & Completa ($\mu$s) & Incremental ($\mu$s) & Speedup \\
+		\midrule
+		--        & --       & --                & --                   & --      \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+% Comparação das vizinhanças (T2):
+% - Mesmo orçamento, greedy descent com random restart, 3 operadores x 3
+%   instâncias (Tabela~\ref{tab:vizinhancas}). Qual leva a melhores ótimos
+%   locais? Qual é mais barata por movimento com avaliação incremental?
+% - Fechar com a vizinhança adotada nos demais experimentos (decisão que
+%   SA e AG usam).
+
+\begin{table}[H]
+	\centering
+	\caption{Greedy descent por vizinhança: melhor $h$ (média $\pm$ dp / mínimo).}
+	\label{tab:vizinhancas}
+	\begin{tabular}{lccc}
+		\toprule
+		Operador  & pequena & intermediária & grande \\
+		\midrule
+		Swap      & --      & --            & --     \\
+		Insertion & --      & --            & --     \\
+		2-opt     & --      & --            & --     \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+% Variantes sob orçamento fixo:
+% - Quantos passos de melhoria e quantos restarts cada variante consegue
+%   dentro de B, por instância (na grande, uma varredura de swap já custa
+%   11\,175 avaliações), e o que isso significa
+%   (Tabela~\ref{tab:gd-passos}).
+
+\begin{table}[H]
+	\centering
+	\caption{Passos de melhoria e restarts por variante (média por execução).}
+	\label{tab:gd-passos}
+	\begin{tabular}{llccc}
+		\toprule
+		Instância & Variante & Passos & Restarts & Melhor $h$ \\
+		\midrule
+		--        & --       & --     & --       & --         \\
+		\bottomrule
+	\end{tabular}
+\end{table}

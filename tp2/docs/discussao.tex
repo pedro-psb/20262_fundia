@@ -1,0 +1,87 @@
+% Enunciado: Seção 5, pontos obrigatórios da discussão
+% Tamanho sugerido: ~1 coluna
+
+\subsection{Ótimos locais}
+\label{subsec:otimos-locais}
+% - Quantos ótimos locais distintos o greedy descent encontrou na
+%   instância pequena ao longo dos restarts (somando as 30 execuções).
+% - Em quantas execuções cada algoritmo alcançou h* = 1875.
+% - Relacionar com ótimo local x ótimo global visto em aula.
+% - Opcional (anexo): histograma dos valores de h dos ótimos locais.
+
+\begin{table}[H]
+	\centering
+	\caption{Instância pequena: ótimos locais e execuções que atingem $h^\star$.}
+	\label{tab:otimos-locais}
+	\begin{tabular}{lcc}
+		\toprule
+		Algoritmo & Ótimos locais distintos & Exec. com $h^\star$ (de 30) \\
+		\midrule
+		GD+RR     & --                      & --                              \\
+		SA        & n/a                     & --                              \\
+		AG        & n/a                     & --                              \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\subsection{Exploração $\times$ intensificação}
+\label{subsec:exploracao}
+% - Para cada algoritmo, qual mecanismo explora e qual intensifica.
+% - Onde os dados mostram equilíbrio bem/mal ajustado, apontando figuras:
+%   restarts (Tabela~\ref{tab:gd-passos}), taxa de aceitação
+%   (Figura~\ref{fig:sa-aceitacao}), diversidade
+%   (Figura~\ref{fig:ag-diversidade}) e distância melhor x média do AG
+%   (Figura~\ref{fig:convergencia}).
+
+\begin{table}[H]
+	\centering
+	\caption{Mecanismos de exploração e intensificação de cada algoritmo.}
+	\label{tab:exploracao}
+	\begin{tabular}{lp{0.33\columnwidth}p{0.33\columnwidth}}
+		\toprule
+		Algoritmo & Exploração & Intensificação \\
+		\midrule
+		GD+RR     & --         & --             \\
+		SA        & --         & --             \\
+		AG        & --         & --             \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\subsection{Efeito da escala}
+\label{subsec:escala}
+% - O ranking dos três algoritmos muda da instância pequena para a grande?
+% - Se sim: hipótese ligada ao custo de varrer a vizinhança (O(n^2)
+%   sucessores por passo) e ao tamanho do espaço de busca, sustentada com
+%   os dados (Tabelas~\ref{tab:principal}, \ref{tab:gd-passos} e
+%   \ref{tab:tempo}).
+% - Se não: mostrar com os p-valores que a estabilidade do ranking é
+%   estatisticamente sustentada.
+% Sem figura própria; reaproveitar as da Seção~\ref{subsec:comparacao}.
+
+\subsection{Quando o algoritmo genético compensa?}
+\label{subsec:quando-ag}
+% - Existe instância em que o AG supera as duas buscas locais com
+%   significância estatística? Citar Tabela~\ref{tab:pvalores}.
+% - Hipótese em termos da codificação: a recombinação consegue combinar bons
+%   trechos de sequência de dois pais num filho melhor?
+% - Experimento adicional que testa a hipótese: desenho (ex.: AG com vs.
+%   sem cruzamento, OX vs. PMX, ou taxa de filhos melhores que ambos os
+%   pais ao longo das gerações), resultado e p-valor.
+
+\begin{table}[H]
+	\centering
+	\caption{Experimento adicional: efeito da recombinação.}
+	\label{tab:experimento-ag}
+	\begin{tabular}{llcc}
+		\toprule
+		Instância & Configuração & Melhor $h$ (média $\pm$ dp) & p-valor \\
+		\midrule
+		--        & --           & --                          & --      \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+% Opcional, se o experimento for sobre a dinâmica ao longo das gerações:
+% figura com a curva medida (ex.: fração de filhos melhores que os pais
+% x geração). Arquivo sugerido: results/ag\_experimento.png

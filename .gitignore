@@ -14,3 +14,4 @@ _build
 *.zip
 *.helix
 .analise.stamp
+/tp2/docs/results/

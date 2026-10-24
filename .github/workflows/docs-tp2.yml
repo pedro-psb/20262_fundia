@@ -1,0 +1,30 @@
+name: Docs TP2
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "tp2/**"
+      - ".python-version"
+      - ".github/workflows/docs-tp2.yml"
+
+defaults:
+  run:
+    working-directory: tp2
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: "tp2/uv.lock"
+      - run: uv sync
+      - run: make docs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: relatorio-tp2
+          path: tp2/pdf/main.pdf
+          if-no-files-found: error

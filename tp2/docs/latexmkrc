@@ -1,0 +1,7 @@
+# Configuracao compartilhada entre `make docs` (container) e `make docs-live` (nativo).
+# Caminhos relativos ao diretorio docs/.
+@default_files = ('main.tex');
+$pdf_mode = 1;
+$pdflatex = 'pdflatex -file-line-error %O %S';
+$out_dir = '_build';
+$out2_dir = '../pdf';

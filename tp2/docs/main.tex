@@ -9,12 +9,23 @@
 \usepackage{float}
 \usepackage{enumitem}
 \usepackage[hidelinks]{hyperref}
-\usepackage{lipsum}
 \addbibresource{references.bib}
 
+% Caixa provisória para figuras ainda não geradas. Substitua por
+% \includegraphics{results/...} quando o gráfico existir.
+% Uso: \placeholder{descrição}  ou  \placeholder[\textwidth]{descrição}
+\newcommand{\placeholder}[2][\columnwidth]{%
+	\fbox{\parbox[c][3cm][c]{\dimexpr#1-2\fboxsep-2\fboxrule\relax}{%
+			\centering\footnotesize\textit{#2}}}}
+
+% Convenções:
+%   - rótulos com prefixo: sec:, subsec:, fig:, tab:, eq:
+%   - figuras geradas por código ficam em results/ (ver README, "Reprodução")
+%   - orçamento total sugerido pelo enunciado: ~5 páginas sem anexos;
+%     figuras extras vão para anexos.tex
+
 \title{
-	% TODO: título do trabalho
-	Título do Trabalho \\
+	Busca Local e Metaheurísticas no Sequenciamento de Manutenção de Ativos \\
 	\textit{\large TP2 - Fundamentos de Inteligência Artificial (2026/2)}
 }
 \author{
@@ -38,12 +49,13 @@
 
 \input{abstract.tex}
 \input{intro.tex}
-\input{modelagem.tex}
-\input{parte1.tex}
-\input{parte2.tex}
-\input{comparacao.tex}
+\input{metodologia.tex}
+\input{algoritmos.tex}
+\input{resultados.tex}
 \input{conclusao.tex}
 
 \printbibliography
+
+\input{anexos.tex}
 
 \end{document}

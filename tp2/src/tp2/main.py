@@ -1,21 +1,23 @@
 import argparse
+from pathlib import Path
 
 
-def main() -> None:
-    """Ponto de entrada do TP2. Substitua pela implementação do trabalho."""
-    print("TP2: implementação pendente.")
+def main(diretorio: Path) -> list[Path]:
+    """Gera as tabelas e figuras do relatório a partir dos CSVs em docs/resultados."""
+    diretorio.mkdir(parents=True, exist_ok=True)
+    return []
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="TP2 - Fundamentos de IA")
-    parser.parse_args()
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--output",
+        "-o",
+        type=Path,
+        default=Path("docs/results"),
+        help="Diretório onde salvar os gráficos (padrão: docs/results)",
+    )
+    args = parser.parse_args()
 
-
-# Testes
-
-
-class TestMain:
-    def test_main_executa(self, capsys):
-        main()
-        assert "TP2" in capsys.readouterr().out
+    for caminho in main(args.output):
+        print(f"Gráfico salvo em: {caminho}")

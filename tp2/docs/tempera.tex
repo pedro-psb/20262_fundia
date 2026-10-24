@@ -1,0 +1,50 @@
+% Enunciado: Seção 2.4
+% Tamanho sugerido: ~1/2 coluna
+
+\subsection{Simulated Annealing}
+\label{subsec:tempera}
+
+% Algoritmo:
+% - Sucessor sorteado com sucessor_aleatorio (vizinhança escolhida na
+%   Seção~\ref{subsec:busca-local}); aceita se não piora, senão com
+%   probabilidade exp(-Delta/T) (distribuição de Gibbs).
+% - O que é retornado: a melhor solução vista, não a corrente.
+
+% Annealing schedule e calibração:
+% - Schedule adotado (ex.: geométrico T <- alpha T) e iterações por
+%   temperatura.
+% - Calibração automática no início de cada execução: amostrar Delta > 0
+%   de movimentos aleatórios (avaliações contam no orçamento), escolher T0
+%   para aceitação inicial alta e Tf para aceitação final ~0, e alpha para
+%   que o resfriamento termine no orçamento B. A Tabela~\ref{tab:sa-parametros}
+%   mostra os valores obtidos por instância.
+% - Por que uma temperatura da instância pequena não serve na grande.
+
+\begin{table}[H]
+	\centering
+	\caption{Parâmetros do simulated annealing por instância.}
+	\label{tab:sa-parametros}
+	\begin{tabular}{lccccc}
+		\toprule
+		Instância     & $\overline{\Delta^+}$ & $T_0$ & $T_f$ & $\alpha$ & Iter./$T$ \\
+		\midrule
+		pequena       & --                    & --    & --    & --       & --        \\
+		intermediária & --                    & --    & --    & --       & --        \\
+		grande        & --                    & --    & --    & --       & --        \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+% Taxa de aceitação (Figura~\ref{fig:sa-aceitacao}):
+% - Mostrar que começa perto de random walk (~1) e termina perto de greedy
+%   descent (~0). Se não, dizer o que foi corrigido.
+
+\begin{figure}[H]
+	\centering
+	\placeholder{Taxa de aceitação de pioras (janela móvel) x avaliações
+		(mediana das execuções), uma curva por instância; T em eixo secundário
+		opcional. Arquivo: results/sa\_aceitacao.png}
+	\caption{Taxa de aceitação de movimentos piores ao longo da execução do
+		simulated annealing.}
+	\label{fig:sa-aceitacao}
+\end{figure}
