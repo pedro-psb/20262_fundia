@@ -1,62 +1,49 @@
-% Enunciado: Seção 2.5
-% Tamanho sugerido: ~1/2 coluna
-
 \subsection{Algoritmo Genético}
 \label{subsec:genetico}
 
-% Codificação e operadores:
-% - Cromossomo = permutação; gene = posição; alelo = ativo (Figura 2 do
-%   enunciado). Inicialização aleatória de N indivíduos.
-% - Seleção: torneio (ou roleta). Explicar a conversão do custo h em
-%   aptidão adequada ao operador escolhido.
-% - Mutação: operador (escolhido aqui, independente da vizinhança da
-%   busca local) e taxa Pm. Elitismo: quantos indivíduos.
-% - Parada por orçamento: como se trata a última geração incompleta.
-% - Parâmetros e como foram escolhidos (Tabela~\ref{tab:ag-parametros}).
+No Algoritmo Genético implementado, cada indivíduo representa uma rota completa de manutenção válida. Cada gene é a posição no agendamento, e o alelo é o identificador do ativo a ser visitado. Como a função $h$ calcula multas financeiras (logo, o objetivo é minimizar), utilizamos a seleção por torneio: sorteamos pequenos grupos da população e o indivíduo com o menor custo é escolhido para se reproduzir.
 
-% Cruzamento:
-% - Por que cruzamentos de 1 ou k pontos não servem (ativos duplicados).
-% - Operador escolhido (OX, PMX ou por arestas) com exemplo numérico passo
-%   a passo (Tabela~\ref{tab:ag-cruzamento}).
+Usar a codificação por permutação impede o uso de cruzamentos simples (de 1 ou $k$ pontos), pois isso faria com que ativos fossem duplicados ou esquecidos. Para resolver isso, usamos o operador \textit{Order Crossover} (OX), que preserva a validade das rotas. Ele copia um trecho contínuo do primeiro pai e preenche o restante do cromossomo respeitando a ordem circular dos ativos do segundo pai. A Tabela \ref{tab:ag-cruzamento} mostra um exemplo passo a passo.
 
 \begin{table}[H]
-	\centering
-	\caption{Exemplo passo a passo do cruzamento adotado.}
-	\label{tab:ag-cruzamento}
-	\begin{tabular}{ll}
-		\toprule
-		Etapa                   & Permutação \\
-		\midrule
-		Pai 1                   & --         \\
-		Pai 2                   & --         \\
-		Segmento herdado        & --         \\
-		Preenchimento           & --         \\
-		Filho                   & --         \\
-		\bottomrule
-	\end{tabular}
+\centering
+\caption{Exemplo passo a passo do cruzamento \textit{Order Crossover} (OX) adotado.}
+\label{tab:ag-cruzamento}
+\begin{tabular}{ll}
+\toprule
+Etapa                   & Permutação \\
+\midrule
+Pai 1                   & (3, \textbf{1, 5, 2}, 4) \\
+Pai 2                   & (4, 2, 1, 5, 3) \\
+Segmento herdado        & (--, \textbf{1, 5, 2}, --) \\
+Preenchimento (Pai 2)   & (4, --, --, --, 3) \\
+Filho                   & (4, 1, 5, 2, 3) \\
+\bottomrule
+\end{tabular}
 \end{table}
 
 \begin{table}[H]
-	\centering
-	\caption{Parâmetros do algoritmo genético por instância.}
-	\label{tab:ag-parametros}
-	\begin{tabular}{lccccc}
-		\toprule
-		Instância     & $N$ & $P_c$ & $P_m$ & Torneio & Elite \\
-		\midrule
-		\linhasresultado{tab-ag-parametros}
-		\bottomrule
-	\end{tabular}
+\centering
+\caption{Parâmetros do algoritmo genético por instância.}
+\label{tab:ag-parametros}
+\begin{tabular}{lccccc}
+\toprule
+Instância     & $N$ & $P_c$ & $P_m$ & Torneio & Elite \\
+\midrule
+pequena & 100 & 0.90 & 0.20 & 3 & 2 \\
+intermedi\'aria & 100 & 0.90 & 0.20 & 3 & 2 \\
+grande & 100 & 0.90 & 0.20 & 3 & 2 \\
+\bottomrule
+\end{tabular}
 \end{table}
 
-% Diversidade da população (Figura~\ref{fig:ag-diversidade}):
-% - Métrica usada (cromossomos distintos ou distância média entre pares).
-% - Diagnóstico com dados: há convergência prematura? Em que geração?
+A mutação é feita aplicando o operador \textit{Swap} com uma probabilidade baixa ($P_m$). O elitismo também foi implementado para garantir que as 2 melhores rotas da população passem diretamente para a geração seguinte sem sofrer alterações. O algoritmo para imediatamente ao atingir o limite orçamental $B$, cortando gerações pela metade se necessário.
+
+Monitorar a diversidade da população (número de cromossomos distintos, mostrado na Figura \ref{fig:ag-diversidade}) é crucial: se a população convergir rápido demais para soluções iguais, o algoritmo perde a capacidade de busca e vira apenas uma busca local cara.
 
 \begin{figure}[H]
-	\centering
-	\figuraresultado{ag_diversidade.png}{Diversidade da população x geração (mediana das execuções),
-		uma curva por instância.}
-	\caption{Evolução da diversidade da população do algoritmo genético.}
-	\label{fig:ag-diversidade}
+\centering
+\figuraresultado{ag_diversidade.png}{Diversidade da população x geração (mediana das execuções), uma curva por instância.}
+\caption{Evolução da diversidade da população do algoritmo genético.}
+\label{fig:ag-diversidade}
 \end{figure}

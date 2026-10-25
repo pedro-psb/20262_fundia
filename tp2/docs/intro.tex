@@ -1,26 +1,25 @@
-% Enunciado: Seções 1.1 e 1.2 (o problema é dado; apresentar de forma breve)
-% Tamanho sugerido: ~2/3 de coluna
-
 \section{Introdução}
 \label{sec:introducao}
 
-% Parágrafo 1 -- contexto: concessionária de energia, uma única equipe que
-% parte da base e atende um ativo por vez; cada ativo j tem posição
-% (x_j, y_j), duração p_j, prazo d_j e criticidade w_j.
+O sequenciamento de manutenção de ativos em uma concessionária de distribuição de energia é um problema clássico de otimização combinatória. A operação requer que uma única equipe técnica parta da base no início do turno para realizar a manutenção preventiva de $n$ ativos (como transformadores e chaves seccionadoras), atendendo um de cada vez. Para cada ativo $j$, são dados sua posição cartesiana $(x_j, y_j)$, o tempo de serviço estimado $p_j$, um prazo regulatório máximo $d_j$ e um peso de criticidade $w_j$. O tempo de deslocamento $t_{ij}$ entre os pontos $i$ e $j$ é determinado pela distância euclidiana arredondada:
+\begin{equation}
+t_{ij} = \text{round}\left(\sqrt{(x_i - x_j)^2 + (y_i - y_j)^2}\right)
+\label{eq:deslocamento}
+\end{equation}
 
-% Formulação compacta, definindo a notação usada no resto do texto:
-% - tempo de deslocamento t_ij arredondado (\label{eq:deslocamento});
-% - instante de conclusão C_{pi_k} (\label{eq:conclusao});
-% - função de avaliação h(pi) = sum w_j max(0, C_j - d_j) (\label{eq:fitness}).
-% Uma frase sobre o tamanho do espaço (n!, n = 150 => >260 algarismos), o
-% fato de toda permutação ser viável e a tensão entre ir ao mais próximo e
-% ir ao mais urgente.
+A formulação define a solução candidata como uma permutação $\pi = (\pi_1, \pi_2, \dots, \pi_n)$ indicando a ordem de visitação. O instante de conclusão $C_{\pi_k}$ do $k$-ésimo ativo na sequência obedece à relação recursiva:
+\begin{equation}
+C_{\pi_k} = C_{\pi_{k-1}} + t_{\pi_{k-1}\pi_k} + p_{\pi_k}
+\label{eq:conclusao}
+\end{equation}
+com a condição inicial de que a equipe parte da base em $C_{\pi_0} = 0$. A qualidade do sequenciamento é medida pela função de aptidão $h(\pi)$, a qual minimiza o atraso ponderado total:
+\begin{equation}
+h(\pi) = \sum_{j=1}^{n} w_j \cdot \max(0, C_j - d_j)
+\label{eq:fitness}
+\end{equation}
 
-% Parágrafo 2 -- objetivo: comparar busca local (greedy descent com random
-% restart, simulated annealing) e uma metaheurística populacional
-% (algoritmo genético) sob o mesmo orçamento de avaliações, observando o
-% equilíbrio exploração x intensificação. Citar \cite{poole2010}.
+O espaço de soluções possui dimensão fatorial de $n!$, o que, para a instância de $n=150$, representa um valor com mais de 260 algarismos, inviabilizando abordagens exatas de enumeração sistemática. Como o modelo lida com \textit{soft constraints}, onde toda permutação é viável, o problema impõe uma forte tensão algorítmica: deve-se equilibrar o critério guloso pelo ativo geograficamente mais próximo (minimizando tempo de transporte) contra a urgência dos ativos mais críticos (minimizando as multas).
 
-% Parágrafo 3 -- organização do texto, referenciando:
-% Seção~\ref{sec:metodologia}, Seção~\ref{sec:algoritmos},
-% Seção~\ref{sec:resultados} (parte central) e Seção~\ref{sec:conclusao}.
+Diante desse cenário, o presente estudo objetiva avaliar e comparar duas heurísticas de Busca Local (Greedy Descent com Random Restart e Simulated Annealing) com uma metaheurística populacional (Algoritmo Genético). A comparação foi desenhada para operar sob um rigoroso orçamento comum de avaliações, visando observar empiricamente como cada arquitetura gerencia o equilíbrio entre a exploração de novas regiões e a intensificação em torno de ótimos locais \cite{poole2010}.
+
+Este relatório segue estruturado da seguinte forma: a Seção \ref{sec:metodologia} apresenta o protocolo iterativo comum; a Seção \ref{sec:algoritmos} detalha a modelagem de cada algoritmo; a Seção \ref{sec:resultados} consolida a análise comparativa entre as táticas; e a Seção \ref{sec:conclusao} sintetiza os resultados empíricos da pesquisa.

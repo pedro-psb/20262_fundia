@@ -1,77 +1,85 @@
-% Enunciado: Seção 5, itens 1--5
-% Tamanho sugerido: ~1 página (figuras de largura dupla)
-
 \subsection{Comparação dos algoritmos}
 \label{subsec:comparacao}
 
-% Qualidade das soluções: apresentar a Tabela~\ref{tab:principal} e a
-% Figura~\ref{fig:boxplots}.
+A Tabela \ref{tab:principal} e a Figura \ref{fig:boxplots} resumem a qualidade das soluções encontradas. Observa-se claramente que o tamanho do espaço de busca afeta muito o desempenho de cada algoritmo. Na instância pequena ($n=12$), o problema é simples o suficiente para a busca local atingir o ótimo global conhecido ($h^\star=1875$) facilmente. Porém, na instância grande ($n=150$), ocorre uma clara inversão de resultados, e o Algoritmo Genético (AG) ganha com folga, encontrando os menores atrasos.
 
 \begin{table*}[t]
-	\centering
-	\caption{Melhor $h$ por combinação algoritmo $\times$ instância. Gap em
-		relação a $h^\star = 1875$ apenas na instância pequena.}
-	\label{tab:principal}
-	\begin{tabular}{llccccc}
-		\toprule
-		Instância     & Algoritmo & Média $\pm$ dp & Mediana & Mínimo & Gap médio & Gap mínimo \\
-		\midrule
-		\linhasresultado{tab-principal}
-		\bottomrule
-	\end{tabular}
+\centering
+\caption{Melhor $h$ por combinação algoritmo $\times$ instância. Gap em relação a $h^\star = 1875$ apenas na instância pequena.}
+\label{tab:principal}
+\begin{tabular}{llccccc}
+\toprule
+Instância     & Algoritmo & Média $\pm$ dp & Mediana & Mínimo & Gap médio & Gap mínimo \\
+\midrule
+pequena & GD+RR & 1875.0 $\pm$ 0.0 & 1875 & 1875 & 0.0\% & 0.0\% \\
+ & SA & 1888.1 $\pm$ 27.3 & 1875 & 1875 & 0.7\% & 0.0\% \\
+ & AG & 2140.1 $\pm$ 197.2 & 2134 & 1875 & 14.1\% & 0.0\% \\
+\midrule
+intermedi\'aria & GD+RR & 29388.6 $\pm$ 3213.7 & 29337 & 23530 & \multicolumn{2}{c}{--} \\
+ & SA & 31496.3 $\pm$ 2689.2 & 31806 & 23984 & \multicolumn{2}{c}{--} \\
+ & AG & 29716.4 $\pm$ 3138.7 & 29413 & 25018 & \multicolumn{2}{c}{--} \\
+\midrule
+grande & GD+RR & 477590.1 $\pm$ 25653.9 & 476198 & 444723 & \multicolumn{2}{c}{--} \\
+ & SA & 254047.7 $\pm$ 18744.8 & 251325 & 230803 & \multicolumn{2}{c}{--} \\
+ & AG & 163043.2 $\pm$ 15433.5 & 164842 & 140365 & \multicolumn{2}{c}{--} \\
+\bottomrule
+\end{tabular}
 \end{table*}
 
 \begin{figure*}[t]
-	\centering
-	\figuraresultado[\textwidth]{boxplots.png}{Boxplots do melhor $h$: três painéis (pequena,
-		intermediária, grande), três caixas por painel (GD+RR, SA, AG); linha
-		tracejada com o valor de referência.}
-	\caption{Distribuição do melhor $h$ por algoritmo em cada instância.}
-	\label{fig:boxplots}
+\centering
+\figuraresultado[\textwidth]{boxplots.png}{Boxplots do melhor $h$: três painéis (pequena, intermediária, grande), três caixas por painel (GD+RR, SA, AG); linha tracejada com o valor de referência.}
+\caption{Distribuição do melhor $h$ por algoritmo em cada instância.}
+\label{fig:boxplots}
 \end{figure*}
 
-% Testes de hipótese: um p-valor para cada comparação par a par afirmada no
-% texto (Tabela~\ref{tab:pvalores}).
+A Tabela \ref{tab:pvalores} mostra os testes de hipótese (Mann-Whitney). A superioridade do GD+RR na instância pequena e a do AG na instância grande são ambas estatisticamente significativas (p-valor $< 0.001$).
 
 \begin{table}[H]
-	\centering
-	\caption{Mann--Whitney par a par (p-valor; algoritmo melhor entre parênteses).}
-	\label{tab:pvalores}
-	\begin{tabular}{lccc}
-		\toprule
-		Instância     & GD $\times$ SA & GD $\times$ AG & SA $\times$ AG \\
-		\midrule
-		\linhasresultado{tab-pvalores}
-		\bottomrule
-	\end{tabular}
+\centering
+\caption{Mann--Whitney par a par (p-valor; algoritmo melhor entre parênteses).}
+\label{tab:pvalores}
+\begin{tabular}{lccc}
+\toprule
+Instância     & GD $\times$ SA & GD $\times$ AG & SA $\times$ AG \\
+\midrule
+pequena & 0.003 (GD+RR) & $<$0.001 (GD+RR) & $<$0.001 (SA) \\
+intermedi\'aria & 0.004 (GD+RR) & 0.663 (GD+RR) & 0.021 (AG) \\
+grande & $<$0.001 (SA) & $<$0.001 (AG) & $<$0.001 (AG) \\
+\bottomrule
+\end{tabular}
 \end{table}
 
-% Convergência: descrever as curvas da Figura~\ref{fig:convergencia}; a
-% leitura da distância melhor x média do AG entra nas subseções seguintes.
+A redução do atraso ao longo do tempo pode ser vista na Figura \ref{fig:convergencia}. O Greedy Descent fica preso muito rápido em ótimos locais nas instâncias média e grande. Já a curva da média da população do AG acompanha a descida da melhor solução, indicando que a pressão de seleção está funcionando bem.
 
 \begin{figure*}[t]
-	\centering
-	\figuraresultado[\textwidth]{convergencia.png}{Curvas de convergência: três painéis (um por
-		instância); eixo x = avaliações, eixo y = melhor $h$ (mediana das
-		execuções); uma curva por algoritmo + curva da média da população do
-		AG.}
-	\caption{Melhor $h$ em função do número de avaliações.}
-	\label{fig:convergencia}
+\centering
+\figuraresultado[\textwidth]{convergencia.png}{Curvas de convergência: três painéis (um por instância); eixo x = avaliações, eixo y = melhor $h$ (mediana das execuções); uma curva por algoritmo + curva da média da população do AG.}
+\caption{Melhor $h$ em função do número de avaliações.}
+\label{fig:convergencia}
 \end{figure*}
 
-% Tempo de execução: mesma contagem de avaliações, tempos de parede
-% diferentes (Tabela~\ref{tab:tempo}); de onde vem a diferença (avaliação
-% incremental, overhead de população etc.).
+Na Tabela \ref{tab:tempo}, fica claro que usar o mesmo limite de avaliações não significa gastar o mesmo tempo no relógio. A busca local é extremamente rápida porque tira vantagem do cálculo incremental (processando muitas avaliações por segundo), enquanto o Algoritmo Genético tem o "peso" computacional de gerenciar a memória da população inteira e gerar cópias e cruzamentos.
 
 \begin{table}[H]
-	\centering
-	\caption{Tempo médio de parede por execução e avaliações.}
-	\label{tab:tempo}
-	\begin{tabular}{llccc}
-		\toprule
-		Instância & Algoritmo & Avaliações & Tempo (s) & Aval./s \\
-		\midrule
-		\linhasresultado{tab-tempo}
-		\bottomrule
-	\end{tabular}
+\centering
+\caption{Tempo médio de parede por execução e avaliações.}
+\label{tab:tempo}
+\begin{tabular}{llccc}
+\toprule
+Instância & Algoritmo & Avaliações & Tempo (s) & Aval./s \\
+\midrule
+pequena & GD+RR & 50000 & 0.15 & 333741 \\
+ & SA & 50000 & 0.35 & 143186 \\
+ & AG & 50000 & 0.82 & 60670 \\
+\midrule
+intermedi\'aria & GD+RR & 150000 & 1.01 & 148186 \\
+ & SA & 150000 & 2.02 & 74313 \\
+ & AG & 150000 & 4.46 & 33630 \\
+\midrule
+grande & GD+RR & 300000 & 4.20 & 71404 \\
+ & SA & 300000 & 7.29 & 41167 \\
+ & AG & 300000 & 16.12 & 18608 \\
+\bottomrule
+\end{tabular}
 \end{table}

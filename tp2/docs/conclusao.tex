@@ -1,11 +1,6 @@
-% Tamanho sugerido: ~1/4 de coluna
-
 \section{Conclusão}
 \label{sec:conclusao}
 
-% Parágrafo 1 -- retomar o objetivo e responder em poucas frases: qual
-% algoritmo foi melhor em cada escala, quão perto da referência chegamos e
-% quando o AG compensa. Sem informação nova.
+Este trabalho avaliou a eficácia de diferentes abordagens heurísticas e metaheurísticas no sequenciamento de manutenção de ativos, com o objetivo de minimizar o atraso ponderado total das operações. Os resultados evidenciam que, enquanto heurísticas de busca local como o \textit{Greedy Descent} apresentam excelência e rapidez em cenários de pequena escala ($n=12$), a sua performance degrada-se vertiginosamente perante a explosão combinatória. Em contrapartida, na instância de larga escala ($n=150$), o Algoritmo Genético demonstrou superioridade estatisticamente significativa. O seu mecanismo de mutação e a dispersão populacional justificaram plenamente o maior custo computacional exigido, escapando às armadilhas dos ótimos locais que aprisionaram os algoritmos puramente focados na intensificação.
 
-% Parágrafo 2 -- limitações (ex.: calibração limitada, poucas execuções na
-% instância grande) e extensões possíveis.
+Apesar da solidez das conclusões, o estudo apresenta limitações inerentes ao orçamento computacional estrito, nomeadamente o número reduzido de execuções independentes viáveis para a instância de grande escala (apenas 10 rodadas), o que pode atenuar a precisão estatística. Como desenvolvimentos futuros, sugere-se a hibridização das técnicas --- por exemplo, injetando a rapidez do \textit{Greedy Descent} como operador de busca local refinada dentro do Algoritmo Genético (formando um Algoritmo Memético) --- e a exploração de codificações matriciais alternativas que tirem um melhor proveito do operador de cruzamento sem anular os tempos de deslocamento adjacentes.

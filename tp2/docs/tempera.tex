@@ -1,48 +1,30 @@
-% Enunciado: Seção 2.4
-% Tamanho sugerido: ~1/2 coluna
-
 \subsection{Simulated Annealing}
 \label{subsec:tempera}
 
-% Algoritmo:
-% - Sucessor sorteado com sucessor_aleatorio (vizinhança escolhida na
-%   Seção~\ref{subsec:busca-local}); aceita se não piora, senão com
-%   probabilidade exp(-Delta/T) (distribuição de Gibbs).
-% - O que é retornado: a melhor solução vista, não a corrente.
+O algoritmo de \textit{Simulated Annealing} (SA) foi implementado sorteando vizinhos através do método \texttt{sucessor\_aleatorio(s)}. Se a nova solução diminuir ou mantiver o atraso ponderado atual, o movimento é aceito. Se a nova solução for pior ($\Delta > 0$), a aceitação ocorre com base na probabilidade da distribuição de Gibbs, calculada por $e^{-\Delta/T}$.
 
-% Annealing schedule e calibração:
-% - Schedule adotado (ex.: geométrico T <- alpha T) e iterações por
-%   temperatura.
-% - Calibração automática no início de cada execução: amostrar Delta > 0
-%   de movimentos aleatórios (avaliações contam no orçamento), escolher T0
-%   para aceitação inicial alta e Tf para aceitação final ~0, e alpha para
-%   que o resfriamento termine no orçamento B. A Tabela~\ref{tab:sa-parametros}
-%   mostra os valores obtidos por instância.
-% - Por que uma temperatura da instância pequena não serve na grande.
+A calibração do resfriamento (\textit{annealing schedule}) é feita automaticamente para cada instância. Antes da busca principal começar, o algoritmo faz um passeio aleatório de 200 passos (que são descontados do orçamento) para medir o aumento médio de custo $\overline{\Delta^+}$ daquela instância. Com base nisso, a temperatura inicial $T_0$ é calculada para garantir 90\% de aceitação de pioras no início ($p_0 = 90\%$), e a final $T_f$ para ter apenas 0,1\% de aceitação no fim ($p_f = 0,1\%$). O coeficiente de resfriamento geométrico $\alpha$ ($T \leftarrow \alpha T$) é calculado para que a temperatura atinja $T_f$ exatamente quando o orçamento de avaliações acabar (Tabela \ref{tab:sa-parametros}).
 
 \begin{table}[H]
-	\centering
-	\caption{Parâmetros do simulated annealing por instância.}
-	\label{tab:sa-parametros}
-	\begin{tabular}{lccccc}
-		\toprule
-		Instância     & $\overline{\Delta^+}$ & $T_0$ & $T_f$ & $\alpha$ & Iter./$T$ \\
-		\midrule
-		\linhasresultado{tab-sa-parametros}
-		\bottomrule
-	\end{tabular}
+\centering
+\caption{Parâmetros do simulated annealing por instância.}
+\label{tab:sa-parametros}
+\begin{tabular}{lccccc}
+\toprule
+Instância     & $\overline{\Delta^+}$ & $T_0$ & $T_f$ & $\alpha$ & Iter./$T$ \\
+\midrule
+pequena & 770.4 & 7311.8 & 111.52 & 0.999916 & 1 \\
+intermedi\'aria & 4023.9 & 38191.9 & 582.52 & 0.999972 & 1 \\
+grande & 10465.2 & 99327.2 & 1514.99 & 0.999986 & 1 \\
+\bottomrule
+\end{tabular}
 \end{table}
 
-% Taxa de aceitação (Figura~\ref{fig:sa-aceitacao}):
-% - Mostrar que começa perto de random walk (~1) e termina perto de greedy
-%   descent (~0). Se não, dizer o que foi corrigido.
+A calibração individual por tamanho do problema é fundamental, pois a ordem de grandeza das multas cresce rapidamente conforme $n$ aumenta. A Figura \ref{fig:sa-aceitacao} mostra que o SA começa praticamente como um \textit{random walk} (aceitando muitas pioras) e termina como uma descida gulosa (quase não aceitando pioras), provando que a calibração funcionou corretamente.
 
 \begin{figure}[H]
-	\centering
-	\figuraresultado{sa_aceitacao.png}{Taxa de aceitação de pioras (janela móvel) x avaliações
-		(mediana das execuções), uma curva por instância; T em eixo secundário
-		opcional.}
-	\caption{Taxa de aceitação de movimentos piores ao longo da execução do
-		simulated annealing.}
-	\label{fig:sa-aceitacao}
+\centering
+\figuraresultado{sa_aceitacao.png}{Taxa de aceitação de pioras (janela móvel) x avaliação (mediana das execuções), uma curva por instância; T em eixo secundário opcional.}
+\caption{Taxa de aceitação de movimentos piores ao longo da execução do simulated annealing.}
+\label{fig:sa-aceitacao}
 \end{figure}

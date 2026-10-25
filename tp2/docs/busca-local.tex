@@ -1,71 +1,73 @@
-% Enunciado: Seções 2.3, 3 (avaliação incremental) e T2
-% Tamanho sugerido: ~1/2 coluna
-
 \subsection{Greedy Descent com Random Restart}
 \label{subsec:busca-local}
 
-% Algoritmo e variantes:
-% - Descida gulosa até ótimo local; random restart guardando a melhor
-%   solução, até esgotar o orçamento. Prosa curta, sem pseudocódigo longo.
-% - Variantes implementadas (mínimo duas): best improvement, first
-%   improvement, sucessor aleatório com aceitação de melhora.
-% - Deixar claro como a avaliação da solução corrente entra na contagem.
+O método de descida gulosa (\textit{Greedy Descent}) foi implementado com reinícios aleatórios (\textit{Random Restart}) para evitar que o algoritmo fique preso em ótimos locais. A partir de uma permutação aleatória inicial, o algoritmo explora a vizinhança e sempre se move para o sucessor de menor custo $h$. Quando chega a um ótimo local (onde nenhum vizinho melhora o custo), a execução é reiniciada a partir de uma nova solução gerada do zero. Esse ciclo guarda o registro da melhor solução global encontrada e continua até que o orçamento de avaliações $B$ acabe.
 
-% Avaliação incremental:
-% - Ideia: só o sufixo a partir da primeira posição alterada muda; reusar
-%   os C_k e o atraso acumulado do prefixo.
-% - Em qual(is) vizinhança(s) foi implementada; teste automático que
-%   compara com a avaliação completa; ganho de tempo medido
-%   (Tabela~\ref{tab:incremental}). A contagem de avaliações não muda.
+Implementamos três variantes para escolher o próximo passo: a) \textit{Best improvement}, que varre toda a vizinhança e escolhe o melhor sucessor; b) \textit{First improvement}, que aceita o primeiro vizinho que melhore o custo $h$; e c) \textit{Sucessor aleatório com aceitação de melhora}, que sorteia apenas um vizinho e avança se houver melhora.
+
+Para otimizar o tempo de execução, implementamos a avaliação incremental. Como os movimentos de vizinhança não alteram o prefixo da permutação, o instante de conclusão $C_k$ e o custo acumulado desse trecho inicial não mudam. O nosso código reaproveita esses valores e recalcula o custo apenas do sufixo alterado. Os ganhos de velocidade e a validação exata dos cálculos estão detalhados na Tabela \ref{tab:incremental}.
 
 \begin{table}[H]
-	\centering
-	\caption{Tempo médio por avaliação: completa x incremental.}
-	\label{tab:incremental}
-	\begin{tabular}{llccc}
-		\toprule
-		Instância & Operador & Completa ($\mu$s) & Incremental ($\mu$s) & Speedup \\
-		\midrule
-		\linhasresultado{tab-incremental}
-		\bottomrule
-	\end{tabular}
+\centering
+\caption{Tempo médio por avaliação: completa x incremental.}
+\label{tab:incremental}
+\begin{tabular}{llccc}
+\toprule
+Instância & Operador & Completa ($\mu$s) & Incremental ($\mu$s) & Speedup \\
+\midrule
+pequena & Swap & 1.14 & 1.04 & 1.10 \\
+ & Insertion & 1.06 & 1.04 & 1.02 \\
+ & 2-opt & 1.11 & 0.98 & 1.14 \\
+\midrule
+intermedi\'aria & Swap & 3.54 & 2.83 & 1.25 \\
+ & Insertion & 3.53 & 2.81 & 1.26 \\
+ & 2-opt & 3.58 & 2.79 & 1.28 \\
+\midrule
+grande & Swap & 10.23 & 7.28 & 1.40 \\
+ & Insertion & 10.21 & 7.29 & 1.40 \\
+ & 2-opt & 10.13 & 7.36 & 1.38 \\
+\bottomrule
+\end{tabular}
 \end{table}
 
-% Comparação das vizinhanças (T2):
-% - Mesmo orçamento, greedy descent com random restart, 3 operadores x 3
-%   instâncias (Tabela~\ref{tab:vizinhancas}). Qual leva a melhores ótimos
-%   locais? Qual é mais barata por movimento com avaliação incremental?
-% - Fechar com a vizinhança adotada nos demais experimentos (decisão que
-%   SA e AG usam).
+A qualidade geométrica das vizinhanças foi testada sob o mesmo orçamento, mostrando qual operador encontra os melhores ótimos locais (Tabela \ref{tab:vizinhancas}). Baseado nisso, adotamos o \textit{Swap} para os testes finais.
 
 \begin{table}[H]
-	\centering
-	\caption{Greedy descent por vizinhança: melhor $h$ (média $\pm$ dp / mínimo).}
-	\label{tab:vizinhancas}
-	\begin{tabular}{lccc}
-		\toprule
-		Operador  & pequena & intermediária & grande \\
-		\midrule
-		\linhasresultado{tab-vizinhancas}
-		\bottomrule
-	\end{tabular}
+\centering
+\caption{Greedy descent por vizinhança: melhor $h$ (média $\pm$ dp / mínimo).}
+\label{tab:vizinhancas}
+\begin{tabular}{lccc}
+\toprule
+Operador  & pequena & intermediária & grande \\
+\midrule
+Swap & 1875.0 $\pm$ 0.0/1875 & 8575.4 $\pm$ 3318.2/21887 & 390602.0 $\pm$ 46825.8 \\
+Insertion & 1877.1 $\pm$ 11.3/1875 & 21313.6 $\pm$ 2867.6/16395 & 697380.3 $\pm$ 55287.4 \\
+2-opt & 1875.0 $\pm$ 0.0/1875 & 20323.7 $\pm$ 1323.4/18026 & 522030.8 $\pm$ 34483.7 \\
+\bottomrule
+\end{tabular}
 \end{table}
 
-% Variantes sob orçamento fixo:
-% - Quantos passos de melhoria e quantos restarts cada variante consegue
-%   dentro de B, por instância (na grande, uma varredura de swap já custa
-%   11\,175 avaliações), e o que isso significa
-%   (Tabela~\ref{tab:gd-passos}).
+A comparação entre as três abordagens de melhoria sob um orçamento fixo mostra o problema do custo computacional: na instância grande ($n=150$), fazer uma varredura completa da vizinhança \textit{Swap} gasta 11.175 avaliações, o que limita muito a quantidade de passos que o algoritmo consegue dar (Tabela \ref{tab:gd-passos}). 
 
 \begin{table}[H]
-	\centering
-	\caption{Passos de melhoria e restarts por variante (média por execução).}
-	\label{tab:gd-passos}
-	\begin{tabular}{llccc}
-		\toprule
-		Instância & Variante & Passos & Restarts & Melhor $h$ \\
-		\midrule
-		\linhasresultado{tab-gd-passos}
-		\bottomrule
-	\end{tabular}
+\centering
+\caption{Passos de melhoria e restarts por variante (média por execução).}
+\label{tab:gd-passos}
+\begin{tabular}{llccc}
+\toprule
+Instância & Variante & Passos & Restarts & Melhor $h$ \\
+\midrule
+pequena & best & 667.1 & 88.9 & 1875.0 \\
+ & first & 1718.5 & 88.4 & 1875.0 \\
+ & aleat\'oria & 3691.0 & 255.3 & 1877.1 \\
+\midrule
+intermedi\'aria & best & 120.0 & 2.0 & 29388.6 \\
+ & first & 346.6 & 1.2 & 28575.4 \\
+ & aleat\'oria & 2460.9 & 19.2 & 24690.9 \\
+\midrule
+grande & best & 26.0 & 0.0 & 477590.1 \\
+ & first & 417.8 & 0.0 & 390602.0 \\
+ & aleat\'oria & 1720.4 & 2.3 & 156607.1 \\
+\bottomrule
+\end{tabular}
 \end{table}

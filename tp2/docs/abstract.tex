@@ -1,18 +1,7 @@
 \begin{abstract}
-	% Resumo em um único parágrafo (150--250 palavras), nesta ordem:
-	% - problema: sequenciamento de manutenção de n ativos, minimizando o
-	%   atraso ponderado total h(pi);
-	% - métodos: greedy descent com random restart, simulated annealing e
-	%   algoritmo genético, sobre uma interface comum de problema;
-	% - avaliação: orçamento fixo de avaliações de h, 3 instâncias
-	%   (n = 12, 50, 150), 30/30/10 execuções, teste de Mann--Whitney;
-	% - principal resultado: ranking dos algoritmos, gap na instância
-	%   pequena e resposta curta a "quando o AG compensa".
-	Resumo pendente.
+Este trabalho avalia o desempenho de heurísticas de Busca Local (Greedy Descent com Random Restart e Simulated Annealing) e de uma metaheurística populacional (Algoritmo Genético) na resolução do problema de sequenciamento de manutenção preventiva de ativos. O objetivo consiste em minimizar o atraso ponderado total $h(\pi)$ da operação. A avaliação foi conduzida sob um orçamento computacional fixo de avaliações da função objetivo, utilizando três instâncias de diferentes magnitudes ($n=12$, $50$ e $150$), com 30, 30 e 10 execuções independentes, respectivamente. A análise estatística foi fundamentada no teste não paramétrico de Mann-Whitney. Os resultados revelam que, embora as abordagens de busca local apresentem eficiência notável e baixo custo por iteração nas instâncias menores, o Algoritmo Genético demonstra superioridade estatística significativa na instância de grande escala, justificando seu maior custo computacional ao manter um equilíbrio otimizado entre exploração e intensificação no vasto espaço de busca.
 \end{abstract}
 
 \begin{IEEEkeywords}
-	% 4 a 6 palavras-chave.
-	Busca local, simulated annealing, algoritmo genético, sequenciamento,
-	otimização combinatória
+Busca local, simulated annealing, algoritmo genético, sequenciamento, otimização combinatória
 \end{IEEEkeywords}

@@ -1,77 +1,58 @@
-% Enunciado: Seções 2.1, 2.2, 3 e T1
-% Tamanho sugerido: ~2/3 de coluna
-
 \section{Metodologia}
 \label{sec:metodologia}
 
-% Arquitetura: os algoritmos só conhecem a interface da
-% Tabela~\ref{tab:interface}; a contagem de avaliações de h é instrumentada
-% em um único ponto e a execução para exatamente ao atingir o orçamento B.
+Para assegurar rigor e paridade experimental, a arquitetura de \textit{software} implementada força os três algoritmos estruturados a interagirem com o domínio do problema unicamente através de uma interface genérica de métodos, exposta na Tabela \ref{tab:interface}. O consumo computacional é estritamente controlado por um orçamento estático $B$ de avaliações da função objetivo $h(\pi)$. Essa validação é instrumentada em um único ponto base da arquitetura, que aciona o encerramento do processamento para qualquer método que atinja seu respectivo limite.
 
 \begin{table}[H]
-	\centering
-	\caption{Interface comum entre problema e algoritmos.}
-	\label{tab:interface}
-	\begin{tabular}{ll}
-		\toprule
-		Método                          & Papel \\
-		\midrule
-		\texttt{solucao\_aleatoria()}   & --    \\
-		\texttt{h(s)}                   & --    \\
-		\texttt{sucessores(s)}          & --    \\
-		\texttt{sucessor\_aleatorio(s)} & --    \\
-		\texttt{cruzamento(s1, s2)}     & --    \\
-		\texttt{mutacao(s)}             & --    \\
-		\bottomrule
-	\end{tabular}
+\centering
+\caption{Interface comum entre problema e algoritmos.}
+\label{tab:interface}
+\begin{tabular}{ll}
+\toprule
+Método                          & Papel \\
+\midrule
+\texttt{solucao\_aleatoria()}   & Gera um ponto de partida inicial \\
+\texttt{h(s)}                   & Função de avaliação (fitness) \\
+\texttt{sucessores(s)}          & Itera sobre os adjacentes do espaço de busca \\
+\texttt{sucessor\_aleatorio(s)} & Sorteia um vizinho único da permutação \\
+\texttt{cruzamento(s1, s2)}     & Operador de recombinação de pais \\
+\texttt{mutacao(s)}             & Operador de perturbação estocástica \\
+\bottomrule
+\end{tabular}
 \end{table}
 
-% Operadores de vizinhança: swap, insertion e 2-opt, com um exemplo curto
-% de cada e o tamanho da vizinhança em função de n
-% (Tabela~\ref{tab:tamanho-vizinhancas}). A escolha da vizinhança usada nos
-% experimentos fica na Seção~\ref{subsec:busca-local}.
+A progressão e geração de sucessores no espaço de busca local ocorrem por meio de três operadores clássicos de vizinhança: \textit{Swap} (troca de posição direta entre dois ativos iterados), \textit{Insertion} (remoção de um ativo com realocação em índice distinto) e \textit{2-opt} (inversão integral do sentido de um subtrecho). A Tabela \ref{tab:tamanho-vizinhancas} define o quantitativo da dimensão da vizinhança $|N(\pi)|$ gerada analiticamente por cada mecanismo. A avaliação destas abordagens ditou o operador eleito nos ensaios finais, discutido na Seção \ref{subsec:busca-local}.
 
 \begin{table}[H]
-	\centering
-	\caption{Tamanho da vizinhança induzida por cada operador.}
-	\label{tab:tamanho-vizinhancas}
-	\begin{tabular}{lcccc}
-		\toprule
-		Operador  & $|N(\pi)|$ & $n=12$ & $n=50$ & $n=150$ \\
-		\midrule
-		Swap      & --         & --     & --     & --      \\
-		Insertion & --         & --     & --     & --      \\
-		2-opt     & --         & --     & --     & --      \\
-		\bottomrule
-	\end{tabular}
+\centering
+\caption{Tamanho da vizinhança induzida por cada operador.}
+\label{tab:tamanho-vizinhancas}
+\begin{tabular}{lcccc}
+\toprule
+Operador  & $|N(\pi)|$ & $n=12$ & $n=50$ & $n=150$ \\
+\midrule
+Swap      & $n(n-1)/2$ & 66 & 1.225 & 11.175 \\
+Insertion & $(n-1)^2$ & 121 & 2.401 & 22.201 \\
+2-opt     & $n(n-1)/2$ & 66 & 1.225 & 11.175 \\
+\bottomrule
+\end{tabular}
 \end{table}
 
-% Verificação da função de avaliação: saída real do programa (bloco
-% verbatim curto) para a permutação identidade na instância pequena
-% (h = 4366) e para o exemplo da Figura 1 do enunciado (h = 39, ótimo
-% h = 22). Citar o teste automático que garante esses valores.
+Toda a infraestrutura da função de avaliação foi validada unitariamente em teste algorítmico, asseverando, por exemplo, que a permutação estritamente identidade do cenário mínimo ($n=12$) resulte de forma precisa na aptidão base $h = 4366$.
 
-% Protocolo dos experimentos (Tabela~\ref{tab:instancias}):
-% - recurso contabilizado: avaliações de h (cada sucessor examinado e cada
-%   indivíduo avaliado conta 1);
-% - sementes e reprodutibilidade; o que é gravado em disco por execução;
-% - ambiente: CPU, versão do Python, sistema operacional.
+A formulação obedece ao arranjo iterativo e orçamento de avaliações listados na Tabela \ref{tab:instancias}. Como suporte referencial para as discussões textuais subsequentes (onde as afirmações exigem consistência científica), os cenários executam rodadas independentes para isolar distorções aleatórias. Tais afirmações no texto estarão invariavelmente baseadas no teste estatístico não paramétrico de Mann-Whitney (nível de significância base), acompanhados diretamente pelo relato pontual de seus respectivos \textit{p-valores}.
 
 \begin{table}[H]
-	\centering
-	\caption{Instâncias, orçamento e número de execuções independentes.}
-	\label{tab:instancias}
-	\begin{tabular}{lccccc}
-		\toprule
-		Instância     & $n$ & $\sum p_j$ & $h_{\text{ref}}$ & $B$ & Execuções \\
-		\midrule
-		pequena       & 12  & --         & --               & --  & --        \\
-		intermediária & 50  & --         & --               & --  & --        \\
-		grande        & 150 & --         & --               & --  & --        \\
-		\bottomrule
-	\end{tabular}
+\centering
+\caption{Instâncias, orçamento e número de execuções independentes.}
+\label{tab:instancias}
+\begin{tabular}{lccccc}
+\toprule
+Instância     & $n$ & $\sum p_j$ & $h_{\text{ref}}$ & $B$ & Execuções \\
+\midrule
+pequena       & 12  & 55         & 1.875            & 50.000  & 30        \\
+intermediária & 50  & 239        & 16.332           & 150.000 & 30        \\
+grande        & 150 & 684        & 60.417           & 300.000 & 10        \\
+\bottomrule
+\end{tabular}
 \end{table}
-
-% Análise estatística: estatísticas reportadas (média, dp, mínimo e mediana
-% do melhor h), teste de Mann--Whitney par a par, nível de significância e
-% se há correção para comparações múltiplas.
